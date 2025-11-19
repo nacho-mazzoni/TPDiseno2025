@@ -28,8 +28,8 @@ public class Huesped {
     @Column(nullable = false)
     private String apellido;
 
-    @Column(nullable = false)
-    private String tipodni;
+    @Column(name = "tipodni", nullable = false)
+    private String tipoDni;
 
     @Column(nullable = false)
     private LocalDate fechaNacimiento;
@@ -44,7 +44,7 @@ public class Huesped {
     private String mail;
 
     @Column(nullable = true)
-    private String pos_iva;
+    private String posIva;
 
     @JoinColumns({
         @JoinColumn(name = "calle", referencedColumnName = "calle"),

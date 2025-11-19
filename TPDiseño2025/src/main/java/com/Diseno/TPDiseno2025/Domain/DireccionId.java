@@ -16,7 +16,7 @@ public class DireccionId implements Serializable {
     private String numero;
     private String departamento;
     private String piso;
-    private String cod_postal;
+    private String codPostal;
 
     @Override
     public boolean equals(Object o) {
@@ -27,11 +27,11 @@ public class DireccionId implements Serializable {
                Objects.equals(numero, that.numero) &&
                Objects.equals(departamento, that.departamento) &&
                Objects.equals(piso, that.piso) &&
-               Objects.equals(cod_postal, that.cod_postal);
+               Objects.equals(codPostal, that.codPostal);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(calle, numero, departamento, piso, cod_postal);
+        return Objects.hash(calle, numero, departamento, piso, codPostal);
     }
 }

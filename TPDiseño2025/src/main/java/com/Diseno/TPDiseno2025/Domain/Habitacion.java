@@ -18,11 +18,11 @@ public class Habitacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idHabitacion;
 
-    @JoinColumn(name="idTipo", nullable=false)
+    @JoinColumn(name="idtipo", nullable=false)
     private TipoHabitacion idTipo;
 
     @Column (nullable=false)
-    private Integer noches_descuento;
+    private Integer nochesDescuento;
 
     @Column (nullable=false)
     private String estado;

@@ -16,11 +16,11 @@ public class ResponsablePago {
     @Id
     @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_responsablePago;
+    private Integer idResponsablePago;
 
     @JoinColumn(name = "juridica_cuit", referencedColumnName = "cuit", nullable = true)
     private Juridica juridica;
 
     @Column(nullable = false)
-    private String razon_social;
+    private String razonSocial;
 }
