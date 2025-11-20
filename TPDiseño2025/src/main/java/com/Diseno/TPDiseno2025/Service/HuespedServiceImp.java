@@ -1,7 +1,7 @@
 package com.Diseno.TPDiseno2025.Service;
 
-import java.util.Optional;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +20,14 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
-    public void modificarHuesped(String tipoDni, String numOriginal, Huesped hActualizado) {
+    public void modificarHuesped(String tipoDni, Integer numOriginal, Huesped hActualizado) {
         Huesped existente = obtenerHuesped(tipoDni, numOriginal);
 
-        // acá actualizás los campos que quieras
+        
         existente.setNombre(hActualizado.getNombre());
         existente.setApellido(hActualizado.getApellido());
         existente.setDireccion(hActualizado.getDireccion());
-        // ... etc.
+        
 
         huespedRepository.save(existente);
     }
@@ -38,7 +38,7 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
-    public Huesped obtenerHuesped(String tipoDni, String num) {
+    public Huesped obtenerHuesped(String tipoDni, Integer num) {
         return huespedRepository.findByTipoDniAndNum(tipoDni, num)
                 .orElse(null); // o .orElseThrow(...)
     }
@@ -48,4 +48,4 @@ public class HuespedServiceImp implements HuespedService {
         return huespedRepository.findAll();
     }
 }
-}
+

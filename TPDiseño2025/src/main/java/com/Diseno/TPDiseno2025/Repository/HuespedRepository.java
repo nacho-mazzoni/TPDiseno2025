@@ -1,0 +1,20 @@
+package com.Diseno.TPDiseno2025.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.Diseno.TPDiseno2025.Domain.Direccion;
+import com.Diseno.TPDiseno2025.Domain.Huesped;
+
+@Repository
+public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
+    
+    Optional<Huesped> findByTipoDniAndNum(String tipoDni, Integer num);
+
+    Boolean existsByDireccion(Direccion direccion);
+
+    List<Huesped> findByNombreStartingWithIgnoreCase(String nombre);
+}
