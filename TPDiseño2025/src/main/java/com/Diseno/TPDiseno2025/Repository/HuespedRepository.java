@@ -12,7 +12,7 @@ import com.Diseno.TPDiseno2025.Domain.Huesped;
 @Repository
 public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
     
-    
+    @Override
     Optional <Huesped> findById(Integer IdHuesped);
 
     Optional<Huesped> findByTipoDniAndNum(String tipoDni, Integer num);

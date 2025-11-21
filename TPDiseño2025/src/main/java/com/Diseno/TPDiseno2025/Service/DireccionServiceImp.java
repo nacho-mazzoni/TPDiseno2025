@@ -41,4 +41,33 @@ public class DireccionServiceImp implements DireccionService {
         return direccionRepository.existsByCalleAndNumeroAndCiudadAndProvinciaAndPais(calle, numero, ciudad, provincia, pais);
     }
 
+    @Override
+    public Direccion mapToEntDireccion(DireccionDTO dDTO) {
+        Direccion direccion = new Direccion();
+        DireccionId id = new DireccionId();
+        id.setCalle(dDTO.getCalle());
+        id.setNumero(dDTO.getNumero());
+        id.setDepartamento(dDTO.getDepartamento());
+        id.setPiso(dDTO.getPiso());
+        id.setCodPostal(dDTO.getCodPostal());
+        direccion.setId(id);
+        direccion.setLocalidad(dDTO.getLocalidad());
+        direccion.setProvincia(dDTO.getProvincia());
+        direccion.setPais(dDTO.getPais());
+        return direccion;
+    }
+
+    @Override
+    public DireccionDTO mapToDTODireccion(Direccion d, DireccionDTO dDTO) {
+        dDTO.setCalle(d.getId().getCalle());
+        dDTO.setNumero(d.getId().getNumero());
+        dDTO.setDepartamento(d.getId().getDepartamento());
+        dDTO.setPiso(d.getId().getPiso());
+        dDTO.setCodPostal(d.getId().getCodPostal());
+        dDTO.setLocalidad(d.getLocalidad());
+        dDTO.setProvincia(d.getProvincia());
+        dDTO.setPais(d.getPais());
+        return dDTO;
+    }
+
 }

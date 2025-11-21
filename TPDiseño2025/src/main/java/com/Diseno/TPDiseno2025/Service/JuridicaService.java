@@ -2,14 +2,16 @@ package com.Diseno.TPDiseno2025.Service;
 
 import java.util.List;
 
+import com.Diseno.TPDiseno2025.Domain.Direccion;
 import com.Diseno.TPDiseno2025.Domain.Juridica;
+import com.Diseno.TPDiseno2025.Model.DireccionDTO;
 import com.Diseno.TPDiseno2025.Model.JuridicaDTO;
 
 public interface JuridicaService {
     
-    void crearJuridica(Integer cuit, String razonSocial, String telefono, String email);
-    JuridicaDTO crearJuridicaDTO(Integer cuit, String razonSocial, String telefono, String email);
-    Juridica get(Integer cuit);
+    void crearJuridica(Integer cuit, String razonSocial, Direccion dir);
+    JuridicaDTO crearJuridicaDTO(Integer cuit, String razonSocial, DireccionDTO dir);
+    Juridica findByCuit(Integer cuit);
     Integer getCuit(Juridica j);
     boolean existsByCuit(String cuit);
     List<Juridica> obtenerTodas();

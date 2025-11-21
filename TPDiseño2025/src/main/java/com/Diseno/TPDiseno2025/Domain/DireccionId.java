@@ -13,10 +13,10 @@ import lombok.Setter;
 @Setter
 public class DireccionId implements Serializable {
     private String calle;
-    private String numero;
+    private Integer numero;
     private String departamento;
     private String piso;
-    private String codPostal;
+    private Integer codPostal;
 
     @Override
     public boolean equals(Object o) {

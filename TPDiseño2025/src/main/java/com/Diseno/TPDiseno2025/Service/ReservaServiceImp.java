@@ -17,8 +17,8 @@ import com.Diseno.TPDiseno2025.Repository.ReservaRepository;
 @Service
 public class ReservaServiceImp implements ReservaService {
     
-    HuespedRepository huespedRepository;
-    HabitacionRepository habitacionRepository;
+    private HuespedRepository huespedRepository;
+    private HabitacionRepository habitacionRepository;
 
     @Autowired
     private ReservaRepository reservaRepository;

@@ -27,4 +27,11 @@ public class TipoHabitacion {
     @Column(nullable = false)
     private Integer cantidadDisponible;
 
+
+    public TipoHabitacion(){}
+
+    public TipoHabitacion(Integer idTipo, String nombreTipo){
+        this.idTipo = idTipo;
+        this.nombreTipo = nombreTipo;
+    }
 }

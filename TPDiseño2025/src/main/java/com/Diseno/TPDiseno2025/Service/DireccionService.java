@@ -12,5 +12,7 @@ public interface DireccionService {
     Direccion obtenerDireccionbyId(DireccionId id);
     List<Direccion> obtenerDireccionesPorCiudad(String ciudad);
     boolean direccionExists(String calle, String numero, String ciudad, String provincia, String pais);
+    Direccion mapToEntDireccion(DireccionDTO dDTO);
+    DireccionDTO mapToDTODireccion(Direccion d, DireccionDTO dDTO);
 
 }

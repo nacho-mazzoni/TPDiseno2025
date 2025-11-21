@@ -1,5 +1,7 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import com.Diseno.TPDiseno2025.Domain.TipoHabitacion;
+
 public class TipoHabitacionServiceImp implements TipoHabitacionService{
 
     @Override
@@ -22,5 +24,29 @@ public class TipoHabitacionServiceImp implements TipoHabitacionService{
                 return 0.00;
         }
     }
+
+    @Override
+    public TipoHabitacion getTipoByIdTipo(Integer idTipo){
+        switch(idTipo){
+            case 1:
+                return new TipoHabitacion(1, "Individual Estándar");
+                
+            case 2:
+                return new TipoHabitacion(2, "Doble Estándar ");
+                
+            case 3:
+                return new TipoHabitacion(3, "Doble Superior");
+                
+            case 4:
+                return new TipoHabitacion(4, "Superior Family Plan");
+            case 5:
+                return new TipoHabitacion(5, "Suite Doble");
+            default:
+                return new TipoHabitacion();
+        }
+    }
     
+ 
+ 
+ 
 }
