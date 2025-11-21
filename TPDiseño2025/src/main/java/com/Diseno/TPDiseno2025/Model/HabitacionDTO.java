@@ -1,5 +1,7 @@
 package com.Diseno.TPDiseno2025.Model;
 
+import com.Diseno.TPDiseno2025.Domain.TipoHabitacion;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,31 +10,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReservaDTO {
+public class HabitacionDTO {
     
-    @NotNull
-    private Integer idReserva;
-
     @NotBlank
-    @Size(max = 10)
-    private String fechaInicio;
-
-    @NotBlank
-    private Integer cantNoches;
-
-    @NotNull
-    private Integer idHuesped;
-
-    @NotNull
     private Integer idHabitacion;
 
     @NotNull
-    private Integer cantHuesped;
+    @NotBlank
+    private TipoHabitacion idTipo;
 
     @NotNull
-    private Boolean descuento;
-
-    @NotBlank
+    private Integer nochesDescuento;
+    
+    @NotNull
+    @Size(max=50)
     private String estado;
-
 }
