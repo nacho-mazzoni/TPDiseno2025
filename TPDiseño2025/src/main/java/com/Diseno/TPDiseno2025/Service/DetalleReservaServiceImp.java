@@ -1,0 +1,60 @@
+package com.Diseno.TPDiseno2025.Service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.Diseno.TPDiseno2025.Domain.DetalleReserva;
+import com.Diseno.TPDiseno2025.Domain.Habitacion;
+import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
+import com.Diseno.TPDiseno2025.Model.ReservaDTO;
+import com.Diseno.TPDiseno2025.Repository.DetalleReservaRepository;
+import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
+
+@Service
+public class DetalleReservaServiceImp implements DetalleReservaService {
+    
+    @Autowired
+    private DetalleReservaRepository detalleReservaRepository;
+
+    private ReservaService reservaService;
+    private HabitacionRepository habitacionRepository;
+    private TipoHabitacionService tipoHabService;
+
+    @Override
+    public void crearDetalle_Reserva(Integer idDetalle, ReservaDTO r, HabitacionDTO h){
+        DetalleReserva detalle = new DetalleReserva();
+        detalle.setIdDetalle(idDetalle);
+        detalle.setIdReserva(reservaService.mapToEntity(r));
+        detalle.setIdHabitacion(habitacionRepository.findById(h.getIdHabitacion()).get());
+        detalle.setCantidad(r.getCantNoches());
+        detalle.setPrecio(tipoHabService.getPrecioByTipo(h.getIdTipo()));
+        detalleReservaRepository.save(detalle);
+    }
+
+    @Override
+    public DetalleReserva obtenerDetalleByIdReservaAndIdHabitacion(Integer r, Integer h){
+        return detalleReservaRepository.findByIdReservaAndIdHabitacion(r, h);
+    }
+
+    @Override
+    public DetalleReserva obtenerDetalle(Integer idDetalle){
+        return detalleReservaRepository.getById(idDetalle);
+    }
+
+    @Override 
+    public void eliminarDetalle(Integer idDetalle){
+        detalleReservaRepository.deleteById(idDetalle);
+    }
+
+    @Override
+    public List<DetalleReserva> obtenerTodos(){
+        return detalleReservaRepository.findAll();
+    }
+
+    @Override
+    public void darDeBajaHabitacion(Integer idDetalle, Habitacion h){
+        detalleReservaRepository.delete(detalleReservaRepository.findById(idDetalle).get());
+    }
+}

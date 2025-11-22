@@ -1,10 +1,7 @@
 package com.Diseno.TPDiseno2025.Model;
 
-import com.Diseno.TPDiseno2025.Domain.TipoHabitacion;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,5 +19,5 @@ public class TipoHabitacionDTO {
     private Double precioNoche;
 
     @NotNull
-    private Integer cantidaDisponible;
+    private Integer cantidadDisponible;
 }

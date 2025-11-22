@@ -3,7 +3,6 @@ package com.Diseno.TPDiseno2025.Service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.Diseno.TPDiseno2025.Domain.Habitacion;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
@@ -33,16 +32,17 @@ public class HabitacionServiceImp implements HabitacionService{
     public HabitacionDTO mapToDTOHabitacion(Habitacion h){
         HabitacionDTO hDTO = new HabitacionDTO();
         hDTO.setIdHabitacion(h.getIdHabitacion());
-        hDTO.setIdTipo(tipoHabitacionService.mapToDTOTipoHabitacion(h.getIdTipo()));
+        hDTO.setIdTipo(h.getIdTipo().getIdTipo());
         hDTO.setNochesDescuento(h.getNochesDescuento());
         hDTO.setEstado(h.getEstado());
+        return hDTO;
     }
 
     @Override
     public Habitacion mapToEntHabitacion(HabitacionDTO hDTO){
         Habitacion h = new Habitacion();
         h.setIdHabitacion(hDTO.getIdHabitacion());
-        h.setIdTipo(tipoHabitacionService.getTipoByIdTipoDTO(hDTO.getIdTipo()));
+        h.setIdTipo(tipoHabitacionService.getTipoByIdTipo(hDTO.getIdTipo()));
         h.setNochesDescuento(hDTO.getNochesDescuento());
         h.setEstado(hDTO.getEstado());
 
@@ -55,7 +55,7 @@ public class HabitacionServiceImp implements HabitacionService{
     }
     
     @Override
-    List<Habitacion> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHata){
-        this.obtenerTodas();
+    public List<Habitacion> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta){
+        return this.obtenerTodas();
     }
 }

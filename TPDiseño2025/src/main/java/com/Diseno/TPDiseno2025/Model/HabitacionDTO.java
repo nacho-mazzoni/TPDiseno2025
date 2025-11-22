@@ -1,8 +1,5 @@
 package com.Diseno.TPDiseno2025.Model;
 
-import com.Diseno.TPDiseno2025.Domain.TipoHabitacion;
-import com.Diseno.TPDiseno2025.Model.TipoHabitacionDTO;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,7 +15,7 @@ public class HabitacionDTO {
 
     @NotNull
     @NotBlank
-    private TipoHabitacionDTO idTipo;
+    private Integer idTipo;
 
     @NotNull
     private Integer nochesDescuento;

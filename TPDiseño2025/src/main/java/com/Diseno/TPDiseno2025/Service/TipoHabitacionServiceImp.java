@@ -1,6 +1,7 @@
 package com.Diseno.TPDiseno2025.Service;
 
 import com.Diseno.TPDiseno2025.Domain.TipoHabitacion;
+import com.Diseno.TPDiseno2025.Model.TipoHabitacionDTO;
 
 public class TipoHabitacionServiceImp implements TipoHabitacionService{
 
@@ -46,7 +47,27 @@ public class TipoHabitacionServiceImp implements TipoHabitacionService{
         }
     }
     
- 
- 
+    @Override
+    public TipoHabitacionDTO mapToDTOTipoHabitacion(TipoHabitacion tipoH){
+        TipoHabitacionDTO hDTO = new TipoHabitacionDTO();
+        hDTO.setIdTipo(tipoH.getIdTipo());
+        hDTO.setNombreTipo(tipoH.getNombreTipo());
+        hDTO.setPrecioNoche(tipoH.getPrecioNoche());
+        hDTO.setCantidadDisponible(tipoH.getCantidadDisponible());
+        
+        return hDTO;
+    
+    }
+
+    @Override
+    public TipoHabitacion mapToEntTipoHabitacion(TipoHabitacionDTO tipoDTO){
+        TipoHabitacion nuevaHab = new TipoHabitacion();
+        nuevaHab.setIdTipo(tipoDTO.getIdTipo());
+        nuevaHab.setNombreTipo(tipoDTO.getNombreTipo());
+        nuevaHab.setPrecioNoche(tipoDTO.getPrecioNoche());
+        nuevaHab.setCantidadDisponible(tipoDTO.getCantidadDisponible());
+        
+        return nuevaHab;
+    }
  
 }
