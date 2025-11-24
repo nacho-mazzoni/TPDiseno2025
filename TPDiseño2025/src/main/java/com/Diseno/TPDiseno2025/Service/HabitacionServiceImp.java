@@ -1,11 +1,15 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.Diseno.TPDiseno2025.Domain.Habitacion;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
+import com.Diseno.TPDiseno2025.Model.HabitacionEstadosDTO;
 import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
 
 
@@ -17,6 +21,9 @@ public class HabitacionServiceImp implements HabitacionService{
 
     private TipoHabitacionService tipoHabitacionService;
 
+    @Autowired
+    private ReservaService reservaService;
+
     @Override
     public void crearHabitacion(Integer idHabitacion, Integer idTipo, Integer nochesDesc, String estado){
         Habitacion nuevaHab = new Habitacion();
@@ -26,6 +33,11 @@ public class HabitacionServiceImp implements HabitacionService{
         nuevaHab.setEstado(estado);
 
         habitacionRepository.save(nuevaHab);
+    }
+
+    @Override
+    public Optional<Habitacion> obtenerHabitacionPorId(Integer idhabitacion){
+        return habitacionRepository.findById(idhabitacion);
     }
 
     @Override
@@ -55,7 +67,31 @@ public class HabitacionServiceImp implements HabitacionService{
     }
     
     @Override
-    public List<Habitacion> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta){
-        return this.obtenerTodas();
+    public List<HabitacionEstadosDTO> mostrarestadoHabitacionesByFecha(LocalDate fechaDesde, LocalDate fechaHasta){
+        
+        List<Habitacion> habitaciones = this.obtenerTodas();
+
+        List<HabitacionEstadosDTO> matrizHabitacionesEstados = new ArrayList<>();
+
+        for (Habitacion h : habitaciones) {
+            HabitacionEstadosDTO dto = new HabitacionEstadosDTO();
+            dto.setIdHabitacion(h.getIdHabitacion());
+            dto.setIdTipo(h.getIdTipo());
+            
+            List<String> estadosPorDia = new ArrayList<>();
+            LocalDate fechaActual = fechaDesde;
+
+            while (!fechaActual.isAfter(fechaHasta)) {
+                // Usamos la función que devuelve el estado por día
+                String estadoDia = reservaService.habitacionReservadaPorDia(h, fechaActual);
+                estadosPorDia.add(estadoDia);
+                fechaActual = fechaActual.plusDays(1);
+            }
+
+            dto.setEstados(estadosPorDia);
+            matrizHabitacionesEstados.add(dto);
+    }
+
+    return matrizHabitacionesEstados;
     }
 }

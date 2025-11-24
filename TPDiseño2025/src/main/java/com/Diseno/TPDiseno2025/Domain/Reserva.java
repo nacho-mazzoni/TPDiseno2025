@@ -38,6 +38,9 @@ public class Reserva {
     @Column(nullable = false)
     private Boolean descuento;
 
+    @Column
+    private Estadia estadia;
+
     @Column(nullable=false)
     private String estado; // Aceptado, Rechazado, En Proceso, Finalizado, Pagado, Cancelado
 }

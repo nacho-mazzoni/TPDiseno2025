@@ -17,7 +17,10 @@ import com.Diseno.TPDiseno2025.Repository.ReservaRepository;
 @Service
 public class ReservaServiceImp implements ReservaService {
     
+    @Autowired
     private HuespedRepository huespedRepository;
+
+    @Autowired
     private HabitacionRepository habitacionRepository;
 
     @Autowired
@@ -87,4 +90,27 @@ public class ReservaServiceImp implements ReservaService {
         return reserva;
     }   
 
+    public List<Reserva> obtenerReservasPorHabitacion(Habitacion habitacion) {
+        return reservaRepository.findByHabitacion(habitacion);
+    }
+
+    public String habitacionReservadaPorDia(Habitacion habitacion, LocalDate fecha){
+
+        String estado = "libre";
+        List<Reserva> reservas = this.obtenerReservasPorHabitacion(habitacion);
+
+        for (Reserva r : reservas) {
+            LocalDate inicioReserva = r.getFechaInicio();
+            LocalDate finReserva = inicioReserva.plusDays(r.getCantNoches() - 1);
+
+            if (!fecha.isBefore(inicioReserva) && !fecha.isAfter(finReserva)) {
+                if (r.getEstadia() != null) {
+                    estado = "Ocupado";
+                } else {
+                    estado = "Reservado";
+                }
+            }
+        }
+        return estado;
+    }
 }
