@@ -18,7 +18,7 @@ public class HabitacionEstadosDTO {
     private Integer idHabitacion;
 
     @NotNull
-    private TipoHabitacion idTipo;
+    private Integer idTipo;
     
     private List<String> estados = new ArrayList<>();
 }
