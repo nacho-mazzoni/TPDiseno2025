@@ -41,7 +41,7 @@ public class Huesped {
     private String ocupacion;
 
     @Column(nullable = true)
-    private String mail;
+    private String email;
 
     @Column(nullable = true)
     private String posIva;

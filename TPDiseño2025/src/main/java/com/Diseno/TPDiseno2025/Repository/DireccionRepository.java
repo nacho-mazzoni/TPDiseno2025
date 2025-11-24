@@ -17,7 +17,7 @@ public interface DireccionRepository extends JpaRepository<Direccion, DireccionI
 
     Boolean existsByCalleAndNumeroAndCiudadAndProvinciaAndPais(
         String calle, 
-        String numero, 
+        Integer numero, 
         String ciudad, 
         String provincia, 
         String pais
