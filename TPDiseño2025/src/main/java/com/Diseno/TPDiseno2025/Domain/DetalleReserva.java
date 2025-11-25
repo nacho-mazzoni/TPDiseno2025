@@ -33,7 +33,7 @@ public class DetalleReserva {
     private Double precio;
 
     @Column(nullable = false)
-    private Integer cantidad;
+    private Integer cantidadNoches;
 
     @JoinColumn(name = "id_reserva", nullable = false)
     @NotNull

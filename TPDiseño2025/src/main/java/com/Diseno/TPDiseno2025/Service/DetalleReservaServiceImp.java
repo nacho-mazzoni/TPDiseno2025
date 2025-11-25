@@ -28,7 +28,7 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
         detalle.setIdDetalle(idDetalle);
         detalle.setIdReserva(reservaService.mapToEntity(r));
         detalle.setIdHabitacion(habitacionRepository.findById(h.getIdHabitacion()).get());
-        detalle.setCantidad(r.getCantNoches());
+        detalle.setCantidadNoches(r.getCantNoches());
         detalle.setPrecio(tipoHabService.getPrecioByTipo(h.getIdTipo()));
         detalleReservaRepository.save(detalle);
     }
