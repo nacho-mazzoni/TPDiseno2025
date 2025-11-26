@@ -11,6 +11,6 @@ public interface HabitacionService {
     HabitacionDTO mapToDTOHabitacion(Habitacion h);
     Habitacion mapToEntHabitacion(HabitacionDTO hDto);
     List<Habitacion> obtenerTodas();
-    List<Habitacion> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta);
+    List<String> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta);
 
 }

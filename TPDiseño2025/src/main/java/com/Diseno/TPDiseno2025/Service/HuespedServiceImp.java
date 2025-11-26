@@ -45,8 +45,8 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
-    public Huesped obtenerHuesped(String tipoDni, Integer num) {
-        return huespedRepository.findByTipoDniAndNum(tipoDni, num)
+    public Huesped obtenerHuesped(String tipoDni, Integer dni) {
+        return huespedRepository.findByTipoDniAndDni(tipoDni, dni)
                 .orElse(null); // o .orElseThrow(...)
     }
 
@@ -76,9 +76,9 @@ public class HuespedServiceImp implements HuespedService {
         if (direccionService.direccionExists(
                 direccionDTO.getCalle(),
                 direccionDTO.getNumero(),
-                direccionDTO.getCiudad(),
-                direccionDTO.getProvincia(),
-                direccionDTO.getPais()
+                direccionDTO.getDepartamento(),
+                direccionDTO.getPiso(),
+                direccionDTO.getCodPostal()
         )) {
             direccion = direccionService.obtenerDireccionbyId(id);
         } 

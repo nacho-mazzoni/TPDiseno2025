@@ -15,7 +15,7 @@ public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
     @Override
     Optional <Huesped> findById(Integer IdHuesped);
 
-    Optional<Huesped> findByTipoDniAndNum(String tipoDni, Integer num);
+    Optional<Huesped> findByTipoDniAndDni(String tipoDni, Integer dni);
 
     Boolean existsByDireccion(Direccion direccion);
 

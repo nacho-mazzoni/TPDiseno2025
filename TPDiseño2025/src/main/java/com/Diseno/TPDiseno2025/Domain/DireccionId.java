@@ -13,6 +13,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DireccionId implements Serializable {
+
+    public DireccionId(){}
+
     @Column(name = "calle")
     private String calle;
     @Column(name = "numero")

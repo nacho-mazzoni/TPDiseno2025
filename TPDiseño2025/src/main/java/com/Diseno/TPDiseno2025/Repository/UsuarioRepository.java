@@ -16,6 +16,6 @@ public interface  UsuarioRepository  extends JpaRepository<Usuario, UsuarioId> {
     @Override
     Optional<Usuario> findById(UsuarioId credenciales);
 
-    List<Usuario> findByCredenciales_NombreUsuarioStartingWithIgnoreCase(String nombreUsuario);
+    List<Usuario> findByCredenciales_NombreStartingWithIgnoreCase(String nombre);
     
 }

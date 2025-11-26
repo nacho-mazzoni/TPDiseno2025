@@ -14,14 +14,8 @@ public interface DireccionRepository extends JpaRepository<Direccion, DireccionI
     
     @Override
     Optional<Direccion> findById(DireccionId direccionId);
-
-    Boolean existsByCalleAndNumeroAndLocalidaddAndProvinciaAndPais(
-        String calle, 
-        String numero, 
-        String localidad, 
-        String provincia, 
-        String pais
-    );
+    @Override
+    boolean existsById(DireccionId direccionId);
 
     List<Direccion> findByLocalidadStartingWithIgnoreCase(String localidad);
 

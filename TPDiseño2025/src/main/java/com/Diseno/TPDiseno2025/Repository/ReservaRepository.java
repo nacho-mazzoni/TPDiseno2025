@@ -13,10 +13,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     
     @Override
     Optional<Reserva> findById(Integer idReserva);
-
-    Boolean existsByHabitacion_IdHabitacion(Integer idHabitacion);
     
-    Boolean existsByHuesped_IdHuesped(Integer idHuesped);
+    Boolean existsByHuesped_Dni(Integer dni);
 
     List<Reserva> findByEstadoStartingWithIgnoreCase(String estado);
 

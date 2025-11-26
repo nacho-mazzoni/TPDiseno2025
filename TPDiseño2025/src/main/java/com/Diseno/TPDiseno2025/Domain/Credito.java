@@ -2,7 +2,6 @@ package com.Diseno.TPDiseno2025.Domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import lombok.Getter;
 import lombok.Setter;
 

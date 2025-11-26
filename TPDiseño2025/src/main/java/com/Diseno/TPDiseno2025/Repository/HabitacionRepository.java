@@ -10,6 +10,4 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Integer>
     @Override
     Optional<Habitacion> findById(Integer idHabitacion);
 
-    String findEstadoByFecha(String fechaDesde);
-
 }

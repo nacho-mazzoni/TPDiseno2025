@@ -10,7 +10,6 @@ import com.Diseno.TPDiseno2025.Domain.Habitacion;
 import com.Diseno.TPDiseno2025.Domain.Huesped;
 import com.Diseno.TPDiseno2025.Domain.Reserva;
 import com.Diseno.TPDiseno2025.Model.ReservaDTO;
-import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
 import com.Diseno.TPDiseno2025.Repository.HuespedRepository;
 import com.Diseno.TPDiseno2025.Repository.ReservaRepository;
 
@@ -18,7 +17,6 @@ import com.Diseno.TPDiseno2025.Repository.ReservaRepository;
 public class ReservaServiceImp implements ReservaService {
     
     private HuespedRepository huespedRepository;
-    private HabitacionRepository habitacionRepository;
 
     @Autowired
     private ReservaRepository reservaRepository;

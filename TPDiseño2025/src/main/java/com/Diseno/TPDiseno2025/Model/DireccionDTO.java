@@ -30,7 +30,7 @@ public class DireccionDTO {
     @Size(max = 50)
     private String localidad;
 
-     @NotBlank
+    @NotBlank
     @Size(max = 50)
     private String ciudad;
 

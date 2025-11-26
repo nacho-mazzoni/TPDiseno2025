@@ -1,5 +1,6 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,11 @@ public class HabitacionServiceImp implements HabitacionService{
     }
     
     @Override
-    public List<Habitacion> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta){
-        return this.obtenerTodas();
+    public List<String> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta){
+        List<String> estadosHabitaciones = new ArrayList<>();
+        for (Habitacion h : this.obtenerTodas()) {
+            estadosHabitaciones.add(h.getEstado());
+        }
+        return estadosHabitaciones;
     }
 }
