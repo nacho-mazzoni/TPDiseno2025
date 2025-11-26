@@ -105,5 +105,10 @@ public class HuespedServiceImp implements HuespedService {
 
         huespedRepository.save(huesped);
     }
+
+    @Override
+    public List<Huesped> buscarHuespedByNombreAndapellidoAndTipoDniAndDni(String nombre, String apellido, String tipoDoc, Integer dni){
+        return this.huespedRepository.findByNombreAndApellidoAndTipoDniAndDniStartingWithIgnoreCase(nombre, apellido, tipoDoc, dni);
+    }
 }
 

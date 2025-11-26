@@ -13,6 +13,11 @@ public interface HuespedService {
     Huesped obtenerHuesped(String tipoDni, Integer num);
     List<Huesped> obtenerTodos();
     void DarDeAltaHuesped(HuespedDTO dto);
-    
+    List<Huesped> buscarHuespedByNombreAndapellidoAndTipoDniAndDni(
+        String nombre,
+        String apellido,
+        String tipoDoc,
+        Integer dni
+    );
 }
 
