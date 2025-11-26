@@ -23,10 +23,12 @@ public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
 
     List<Huesped> findByNombreStartingWithIgnoreCase(String nombre);
 
-    List<Huesped> findByNombreAndApellidoAndTipoDniAndDniStartingWithIgnoreCase(
+    Huesped findByNombreAndApellidoAndTipoDniAndDniStartingWithIgnoreCase(
         String nombre,
         String apellido,
         String tipoDni,
         Integer dni
     );
+
+    List<Huesped> getByNombre(String nombre);
 }

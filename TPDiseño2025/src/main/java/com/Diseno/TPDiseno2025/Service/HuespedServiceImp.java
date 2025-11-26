@@ -1,5 +1,6 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,22 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
+    public Integer crearHuespedDTO(HuespedDTO hDTO){
+        huespedRepository.save(this.mapToEntity(new Huesped(), hDTO));
+        return huespedRepository.findById(hDTO.getDni()).get().getDni();
+    }
+
+    @Override
+    public Huesped buscarHuespedByTipoDniAndDni(String tipodni, Integer dni){
+        return huespedRepository.findByTipoDniAndDni(tipodni, dni).get();
+    }
+
+    @Override
+    public HuespedDTO buscarHuespedDTOByTipoDniAndDni(String tipodni, Integer dni){
+        return mapToDTO(buscarHuespedByTipoDniAndDni(tipodni, dni), new HuespedDTO());
+    }
+
+    @Override
     public void modificarHuesped(String tipoDni, Integer numOriginal, Huesped hActualizado) {
         Huesped existente = obtenerHuesped(tipoDni, numOriginal);
 
@@ -40,8 +57,12 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
-    public void eliminarHuesped(Huesped h) {
-        huespedRepository.delete(h);
+    public void eliminarHuespedByTipoDniAndDni(String tipoDni, Integer dni) {
+        if(huespedRepository.findByTipoDniAndDni(tipoDni, dni) != null){
+            huespedRepository.delete(huespedRepository.findByTipoDniAndDni(tipoDni, dni).get());
+        } else{
+            // throws huesped no encontrado exception
+        }
     }
 
     @Override
@@ -53,6 +74,17 @@ public class HuespedServiceImp implements HuespedService {
     @Override
     public List<Huesped> obtenerTodos() {
         return huespedRepository.findAll();
+    }
+
+    @Override 
+    public List<HuespedDTO> obtenerTodosDTO(){
+        List<HuespedDTO> huespedes = new ArrayList<>();
+        for(Huesped h : this.obtenerTodos()){
+            HuespedDTO hDTO = new HuespedDTO();
+            hDTO = this.mapToDTO(h, hDTO);
+            huespedes.add(hDTO);
+        }
+        return huespedes;
     }
 
     @Override
@@ -107,8 +139,62 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
-    public List<Huesped> buscarHuespedByNombreAndapellidoAndTipoDniAndDni(String nombre, String apellido, String tipoDoc, Integer dni){
+    public Huesped buscarHuespedByNombreAndapellidoAndTipoDniAndDni(String nombre, String apellido, String tipoDoc, Integer dni){
         return this.huespedRepository.findByNombreAndApellidoAndTipoDniAndDniStartingWithIgnoreCase(nombre, apellido, tipoDoc, dni);
+    }
+
+    @Override
+    public HuespedDTO mapToDTO(Huesped h, HuespedDTO hDTO){
+        hDTO.setDni(h.getDni());
+        hDTO.setNombre(h.getNombre());
+        hDTO.setApellido(h.getApellido());
+        hDTO.setTipoDni(h.getTipoDni());
+        hDTO.setDireccion(direccionService.mapToDTODireccion(h.getDireccion(), new DireccionDTO()));
+        hDTO.setEmail(h.getEmail());
+        hDTO.setFechaNacimiento(h.getFechaNacimiento());
+        hDTO.setEdad(h.getEdad());
+        hDTO.setOcupacion(h.getOcupacion());
+        hDTO.setPosIva(h.getPosIva());
+        return hDTO;
+    }
+
+    @Override
+    public Huesped mapToEntity(Huesped h, HuespedDTO hDTO){
+        h.setDni(hDTO.getDni());
+        h.setNombre(hDTO.getNombre());
+        h.setApellido(hDTO.getApellido());
+        h.setTipoDni(hDTO.getTipoDni());
+        h.setDireccion(direccionService.mapToEntDireccion(hDTO.getDireccion()));
+        h.setEmail(hDTO.getEmail());
+        h.setFechaNacimiento(hDTO.getFechaNacimiento());
+        h.setEdad(hDTO.getEdad());
+        h.setOcupacion(hDTO.getOcupacion());
+        h.setPosIva(hDTO.getPosIva());
+        return h;
+    }
+
+    @Override
+    public List<Huesped> getByNombre(String nombre){
+        return this.huespedRepository.getByNombre(nombre);
+    }
+    
+    @Override 
+    public List<HuespedDTO> getByNombreDTO(String nombre){
+        List<HuespedDTO> huespedes = new ArrayList<>();
+        for(Huesped h : this.getByNombre(nombre)){
+            huespedes.add(this.mapToDTO(h, new HuespedDTO()));
+        }
+        return huespedes;
+    }
+
+    @Override
+    public void modificarHuespedDTO(String tipoDni, Integer dni, HuespedDTO hDTO){
+        if(huespedRepository.existsByDni(dni)){
+            huespedRepository.delete(huespedRepository.findByTipoDniAndDni(tipoDni, dni).get());
+        }else{
+           // throws(new HuespedNotfoundException());
+        }
+        huespedRepository.save(this.mapToEntity(new Huesped(), hDTO));
     }
 }
 

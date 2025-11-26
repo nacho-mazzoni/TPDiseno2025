@@ -8,16 +8,25 @@ import com.Diseno.TPDiseno2025.Model.HuespedDTO;
 public interface HuespedService {
  
     void crearHuesped(Huesped h);
+    Integer crearHuespedDTO(HuespedDTO hDTO);
+    Huesped buscarHuespedByTipoDniAndDni(String tipodni, Integer dni);
+    HuespedDTO buscarHuespedDTOByTipoDniAndDni(String tipodni, Integer dni);
     void modificarHuesped(String tipoDni, Integer numOriginal, Huesped hActualizado);
-    void eliminarHuesped(Huesped h);
+    void modificarHuespedDTO(String tipoDni, Integer dni, HuespedDTO hDTO);
+    void eliminarHuespedByTipoDniAndDni(String tipoDni, Integer dni);
     Huesped obtenerHuesped(String tipoDni, Integer num);
     List<Huesped> obtenerTodos();
+    List<HuespedDTO> obtenerTodosDTO();
     void DarDeAltaHuesped(HuespedDTO dto);
-    List<Huesped> buscarHuespedByNombreAndapellidoAndTipoDniAndDni(
+    Huesped buscarHuespedByNombreAndapellidoAndTipoDniAndDni(
         String nombre,
         String apellido,
         String tipoDoc,
         Integer dni
     );
+    HuespedDTO mapToDTO(Huesped h, HuespedDTO hDTO);
+    Huesped mapToEntity(Huesped h, HuespedDTO hDTO);
+    List<Huesped> getByNombre(String nombre);
+    List<HuespedDTO> getByNombreDTO(String nombre);
 }
 
