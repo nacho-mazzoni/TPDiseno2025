@@ -41,8 +41,8 @@ public class Huesped {
     @Column(name = "ocupacion", nullable = false)
     private String ocupacion;
 
-    @Column(name = "mail", nullable = true)
-    private String mail;
+    @Column(name ="email", nullable = true)
+    private String email;
 
     @Column(name = "pos_iva", nullable = true)
     private String posIva;

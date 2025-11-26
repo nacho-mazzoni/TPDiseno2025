@@ -19,5 +19,7 @@ public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
 
     Boolean existsByDireccion(Direccion direccion);
 
+    Boolean existsByDni(Integer dni);
+
     List<Huesped> findByNombreStartingWithIgnoreCase(String nombre);
 }

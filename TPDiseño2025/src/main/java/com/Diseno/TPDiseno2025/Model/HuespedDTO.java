@@ -1,5 +1,6 @@
 package com.Diseno.TPDiseno2025.Model;
 
+import java.time.LocalDate;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -27,18 +28,17 @@ public class HuespedDTO {
     @NotNull
     private Integer dni;
 
-    @NotBlank
+    @NotNull
     private DireccionDTO direccion;
 
     @Email
     @Size(max = 100)
     private String email;
 
-    @NotBlank
-    @Size(max = 50)
-    private String fechaNacimiento;
+    @NotNull
+    private LocalDate fechaNacimiento;
 
-    @NotBlank
+    @NotNull
     private Integer edad;
 
     @NotBlank

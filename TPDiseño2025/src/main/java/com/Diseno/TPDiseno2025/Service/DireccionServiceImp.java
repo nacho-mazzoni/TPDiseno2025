@@ -38,7 +38,7 @@ public class DireccionServiceImp implements DireccionService {
 
     @Override
     public boolean direccionExists(String calle, String numero, String localidad, String provincia, String pais) {
-        return direccionRepository.existsByCalleAndNumeroAndLocalidaddAndProvinciaAndPais(calle, numero, localidad, provincia, pais);
+        return direccionRepository.existsByCalleAndNumeroAndLocalidadAndProvinciaAndPais(calle, numero, localidad, provincia, pais);
     }
 
     @Override

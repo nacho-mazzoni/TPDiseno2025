@@ -30,6 +30,10 @@ public class DireccionDTO {
     @Size(max = 50)
     private String localidad;
 
+     @NotBlank
+    @Size(max = 50)
+    private String ciudad;
+
     @NotBlank
     @Size(max = 50)
     private String provincia;
@@ -37,5 +41,7 @@ public class DireccionDTO {
     @NotBlank
     @Size(max = 50)
     private String pais;
+
+
 
 }
