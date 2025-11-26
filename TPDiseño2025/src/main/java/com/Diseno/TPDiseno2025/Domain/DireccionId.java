@@ -3,6 +3,7 @@ package com.Diseno.TPDiseno2025.Domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,10 +13,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DireccionId implements Serializable {
+    @Column(name = "calle")
     private String calle;
+    @Column(name = "numero")
     private Integer numero;
+    @Column(name = "departamento")
     private String departamento;
+    @Column(name = "piso")
     private String piso;
+    @Column(name = "cod_postal")
     private Integer codPostal;
 
     @Override

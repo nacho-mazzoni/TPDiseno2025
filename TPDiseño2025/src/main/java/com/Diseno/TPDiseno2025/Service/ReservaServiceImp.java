@@ -27,7 +27,6 @@ public class ReservaServiceImp implements ReservaService {
     public void crearReserva(Reserva r, Huesped h, Habitacion habitacion) {
         
         r.setHuesped(h);
-        r.setHabitacion(habitacion);
         reservaRepository.save(r);
     }
 
@@ -66,7 +65,6 @@ public class ReservaServiceImp implements ReservaService {
         reserva.setFechaInicio(LocalDate.parse(r.getFechaInicio()));
         reserva.setCantNoches(r.getCantNoches());
         reserva.setDescuento(r.getDescuento());
-        reserva.setHabitacion(habitacionRepository.findById(r.getIdHabitacion()).get());
         reserva.setEstado(r.getEstado());
 
         return reserva;
@@ -81,7 +79,6 @@ public class ReservaServiceImp implements ReservaService {
         reserva.setFechaInicio(r.getFechaInicio().toString());
         reserva.setCantNoches(r.getCantNoches());
         reserva.setDescuento(r.getDescuento());
-        reserva.setIdHabitacion(r.getHabitacion().getIdHabitacion());
         reserva.setEstado(r.getEstado());
 
         return reserva;

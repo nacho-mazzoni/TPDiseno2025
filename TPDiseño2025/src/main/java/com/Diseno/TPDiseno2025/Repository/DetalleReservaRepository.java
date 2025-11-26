@@ -13,9 +13,9 @@ public interface DetalleReservaRepository extends JpaRepository<DetalleReserva, 
     @Override
     Optional<DetalleReserva> findById(Integer idDetalle);
 
-    Boolean existsByIdHabitacionAndIdReserva(Integer idHabitacion, Integer idReserva);
+    Boolean existsByHabitacion_IdHabitacionAndReserva_IdReserva(Integer idHabitacion, Integer idReserva);
 
-    List<DetalleReserva> findByIdReserva(Integer idReserva);
+    List<DetalleReserva> findByReserva_IdReserva(Integer idReserva);
 
     @Override
     DetalleReserva getById(Integer idDetalle);
@@ -23,5 +23,5 @@ public interface DetalleReservaRepository extends JpaRepository<DetalleReserva, 
     @Override
     void deleteById(Integer idDetalle);
 
-    DetalleReserva findByIdReservaAndIdHabitacion(Integer idReserva, Integer IdHabitacion);
+    DetalleReserva findByReserva_IdReservaAndHabitacion_IdHabitacion(Integer idReserva, Integer IdHabitacion);
 }

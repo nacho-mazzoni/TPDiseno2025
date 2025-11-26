@@ -24,9 +24,6 @@ public class ReservaDTO {
     private Integer idHuesped;
 
     @NotNull
-    private Integer idHabitacion;
-
-    @NotNull
     private Integer cantHuesped;
 
     @NotNull

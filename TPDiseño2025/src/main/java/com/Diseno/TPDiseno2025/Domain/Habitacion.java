@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,16 +15,17 @@ import lombok.Setter;
 @Setter
 public class Habitacion {
     @Id
-    @Column(nullable=false, updatable=false)
+    @Column(name = "id_habitacion", nullable=false, updatable=false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idHabitacion;
 
+    @OneToOne
     @JoinColumn(name="idtipo", nullable=false)
     private TipoHabitacion idTipo;
 
-    @Column (nullable=false)
+    @Column (name = "noches_descuento", nullable=false)
     private Integer nochesDescuento;
 
-    @Column (nullable=false)
+    @Column (name = "estado", nullable=false)
     private String estado;
 }

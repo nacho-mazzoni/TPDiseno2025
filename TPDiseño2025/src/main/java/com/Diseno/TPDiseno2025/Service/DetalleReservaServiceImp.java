@@ -26,8 +26,8 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
     public void crearDetalle_Reserva(Integer idDetalle, ReservaDTO r, HabitacionDTO h){
         DetalleReserva detalle = new DetalleReserva();
         detalle.setIdDetalle(idDetalle);
-        detalle.setIdReserva(reservaService.mapToEntity(r));
-        detalle.setIdHabitacion(habitacionRepository.findById(h.getIdHabitacion()).get());
+        detalle.setReserva(reservaService.mapToEntity(r));
+        detalle.setHabitacion(habitacionRepository.findById(h.getIdHabitacion()).get());
         detalle.setCantidadNoches(r.getCantNoches());
         detalle.setPrecio(tipoHabService.getPrecioByTipo(h.getIdTipo()));
         detalleReservaRepository.save(detalle);
@@ -35,7 +35,7 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
 
     @Override
     public DetalleReserva obtenerDetalleByIdReservaAndIdHabitacion(Integer r, Integer h){
-        return detalleReservaRepository.findByIdReservaAndIdHabitacion(r, h);
+        return detalleReservaRepository.findByReserva_IdReservaAndHabitacion_IdHabitacion(r, h);
     }
 
     @Override

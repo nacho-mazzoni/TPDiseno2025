@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,28 +17,26 @@ import lombok.Setter;
 @Setter
 public class Reserva {
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(name = "id_reserva", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idReserva;
 
-    @JoinColumn(name = "dni_huesped", referencedColumnName = "dni", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "dni_huesped", referencedColumnName = "dni_huesped", nullable = false)
     private Huesped huesped;
 
-    @Column(nullable = false)
+    @Column(name = "cant_huesped", nullable = false)
     private Integer cantHuesped;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_inicio", nullable = false)
     private LocalDate fechaInicio;
 
-    @Column(nullable = false)
+    @Column(name = "cant_noches", nullable = false)
     private Integer cantNoches;
 
-    @JoinColumn(name = "id_habitacion", referencedColumnName = "idHabitacion", nullable = false)
-    private Habitacion habitacion;
-
-    @Column(nullable = false)
+    @Column(name = "descuento", nullable = false)
     private Boolean descuento;
 
-    @Column(nullable=false)
+    @Column(name = "estado", nullable=false)
     private String estado; // Aceptado, Rechazado, En Proceso, Finalizado, Pagado, Cancelado
 }

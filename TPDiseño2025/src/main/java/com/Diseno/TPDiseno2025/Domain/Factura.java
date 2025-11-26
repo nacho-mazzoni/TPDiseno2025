@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,25 +17,27 @@ import lombok.Setter;
 @Setter
 public class Factura {
     @Id
-    @Column(nullable = false, unique = true)
+    @Column(name = "id_factura", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idFactura;
 
-    @JoinColumn(name = "id_responsablepago", referencedColumnName = "idResponsablePago", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "id_responsablepago", referencedColumnName = "id_responsablepago", nullable = false)
     private ResponsablePago idResponsablePago;
     
-    @Column(nullable = false)
+    @Column(name = "precio_final", nullable = false)
     private Double precioFinal;
 
-    @JoinColumn(name = "id_estadia", referencedColumnName = "idEstadia", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "id_estadia", referencedColumnName = "id_estadia", nullable = false)
     private Estadia idEstadia;
     
-    @Column(nullable = false)
+    @Column(name = "nro_factura", nullable = false)
     private Integer nroFactura;
 
-    @Column(nullable = false)
+    @Column(name = "tipo_factura", nullable = false)
     private String tipoFactura;
 
-    @Column(nullable= false)
+    @Column(name = "fecha", nullable= false)
     private LocalDate fecha;
 }

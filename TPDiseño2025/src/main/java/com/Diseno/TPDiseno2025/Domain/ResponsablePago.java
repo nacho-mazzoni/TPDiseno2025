@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,13 +15,14 @@ import lombok.Setter;
 @Setter
 public class ResponsablePago {
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(name = "id_responsablepago", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idResponsablePago;
 
-    @JoinColumn(name = "juridica_cuit", referencedColumnName = "cuit", nullable = true)
+    @OneToOne
+    @JoinColumn(name = "juridica_cuit", referencedColumnName = "juridica_cuit", nullable = true)
     private Juridica juridica;
 
-    @Column(nullable = false)
+    @Column(name = "razon_social", nullable = false)
     private String razonSocial;
 }

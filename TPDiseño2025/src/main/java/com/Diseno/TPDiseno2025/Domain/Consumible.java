@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +14,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Consumible {
-    @JoinColumn(name="idEstadia", nullable=false)
-    private Integer idEstadia;
+    @ManyToOne
+    @JoinColumn(name="id_estadia", referencedColumnName="id_estadia", nullable=false)
+    private Estadia idEstadia;
 
     @Column(nullable=false)
     private Double precio;

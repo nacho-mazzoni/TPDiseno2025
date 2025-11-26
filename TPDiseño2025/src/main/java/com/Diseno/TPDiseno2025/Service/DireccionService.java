@@ -10,7 +10,7 @@ public interface DireccionService {
     
     void crearDireccion(DireccionId id, DireccionDTO direccionDTO);
     Direccion obtenerDireccionbyId(DireccionId id);
-    List<Direccion> obtenerDireccionesPorCiudad(String ciudad);
+    List<Direccion> obtenerDireccionesPorLocalidad(String localidad);
     boolean direccionExists(String calle, String numero, String ciudad, String provincia, String pais);
     Direccion mapToEntDireccion(DireccionDTO dDTO);
     DireccionDTO mapToDTODireccion(Direccion d, DireccionDTO dDTO);

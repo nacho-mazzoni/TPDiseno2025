@@ -15,14 +15,14 @@ public interface DireccionRepository extends JpaRepository<Direccion, DireccionI
     @Override
     Optional<Direccion> findById(DireccionId direccionId);
 
-    Boolean existsByCalleAndNumeroAndCiudadAndProvinciaAndPais(
+    Boolean existsByCalleAndNumeroAndLocalidaddAndProvinciaAndPais(
         String calle, 
         String numero, 
-        String ciudad, 
+        String localidad, 
         String provincia, 
         String pais
     );
 
-    List<Direccion> findByCiudadStartingWithIgnoreCase(String ciudad);
+    List<Direccion> findByLocalidadStartingWithIgnoreCase(String localidad);
 
 }

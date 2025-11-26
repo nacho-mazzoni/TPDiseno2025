@@ -6,9 +6,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: alenachosantiagu
       POSTGRES_DB: postgres
+      TZ: America/Argentina/Buenos_Aires
+      PGTZ: America/Argentina/Buenos_Aires
     ports:
       - "5432:5432"
     volumes:
+      - postgres_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
     networks:
       - app-network

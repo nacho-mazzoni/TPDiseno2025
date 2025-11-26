@@ -2,9 +2,7 @@ package com.Diseno.TPDiseno2025.Domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EmbeddedId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,18 +12,16 @@ import lombok.Setter;
 @Setter
 public class Direccion {
     
-    @Id
-    @Column(nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EmbeddedId
     private DireccionId id;
 
-    @Column(nullable = false)
+    @Column(name = "localidad", nullable = false)
     private String localidad;
 
-    @Column(nullable = false)
+    @Column(name = "provincia", nullable = false)
     private String provincia;
 
-    @Column(nullable = false)
+    @Column(name = "pais", nullable = false)
     private String pais;
 
 }

@@ -3,6 +3,7 @@ package com.Diseno.TPDiseno2025.Domain;
 import java.util.Objects;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UsuarioId {
+    @Column(name="nombre")
     private String nombre;
+    @Column(name="psw")
     private String psw;
 
     @Override

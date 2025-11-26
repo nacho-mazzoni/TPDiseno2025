@@ -10,7 +10,6 @@ public interface JuridicaRepository extends JpaRepository<Juridica, Integer>{
     @Override
     Optional<Juridica> findById(Integer cuit);
 
-    @Override
-    boolean existsById(Integer cuit);
+    boolean existsByCuit(Integer cuit);
     
 }

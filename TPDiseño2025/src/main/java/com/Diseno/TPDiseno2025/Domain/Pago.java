@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,22 +18,25 @@ import lombok.Setter;
 @Setter
 public class Pago {
     @Id
-    @Column(nullable=false, updatable=false)
+    @Column(name = "id_pago", nullable=false, updatable=false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idPago;
 
-    @JoinColumn(name="idMedioPago", nullable=false)
+    @ManyToOne
+    @JoinColumn(name="id_mediopago", nullable=false)
     private MedioPago medioPago;
 
-    @JoinColumn(name="idFactura", nullable=false)
+    @OneToOne
+    @JoinColumn(name="id_factura", referencedColumnName="id_factura", nullable=false)
     private Factura factura;
 
-    @JoinColumn(name="idResponsablePago", nullable=false)
+    @OneToOne
+    @JoinColumn(name="id_responsablepago", nullable=false)
     private ResponsablePago responsablePago;
 
-    @Column(nullable=false)
+    @Column(name = "monto",nullable=false)
     private Double monto;
 
-    @Column(nullable=false)
+    @Column(name = "fecha_pago", nullable=false)
     private LocalDate fechaPago;
 }

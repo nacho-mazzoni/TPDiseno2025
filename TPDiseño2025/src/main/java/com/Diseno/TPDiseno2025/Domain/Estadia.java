@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,19 +17,20 @@ import lombok.Setter;
 @Setter
 public class Estadia {
     @Id
-    @Column(nullable=false, unique=true)
+    @Column(name = "id_estadia", nullable=false, unique=true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idEstadia;
 
-    @Column(nullable=false)
+    @Column(name = "precio", nullable=false)
     private Double precio;
 
-    @Column(nullable=false)
+    @Column(name = "hora_checkin", nullable=false)
     private LocalTime horaCheckIn;
 
-    @Column(nullable=false)
+    @Column(name = "hora_checkout", nullable=false)
     private LocalTime horaCheckOut;
 
+    @OneToOne
     @JoinColumn(name="id_reserva", referencedColumnName="id_reserva", nullable=false)
-    private Reserva idReserva;
+    private Reserva reserva;
 }

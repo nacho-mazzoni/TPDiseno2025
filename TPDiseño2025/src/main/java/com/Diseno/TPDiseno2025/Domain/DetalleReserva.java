@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
@@ -25,9 +26,10 @@ public class DetalleReserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idDetalle;
 
-    @JoinColumn(name = "id_habitacion", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "id_habitacion", referencedColumnName="id_habitacion", nullable = false)
     @NotNull
-    private Habitacion idHabitacion;
+    private Habitacion habitacion;
 
     @Column(nullable = false)
     private Double precio;
@@ -35,8 +37,9 @@ public class DetalleReserva {
     @Column(nullable = false)
     private Integer cantidadNoches;
 
-    @JoinColumn(name = "id_reserva", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "id_reserva", referencedColumnName="id_reserva", nullable = false)
     @NotNull
-    private Reserva idReserva;
+    private Reserva reserva;
     
 }

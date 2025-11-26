@@ -32,13 +32,13 @@ public class DireccionServiceImp implements DireccionService {
     }
 
     @Override
-    public List<Direccion> obtenerDireccionesPorCiudad(String ciudad) {
-        return direccionRepository.findByCiudadStartingWithIgnoreCase(ciudad);
+    public List<Direccion> obtenerDireccionesPorLocalidad(String localidad) {
+        return direccionRepository.findByLocalidadStartingWithIgnoreCase(localidad);
     }
 
     @Override
-    public boolean direccionExists(String calle, String numero, String ciudad, String provincia, String pais) {
-        return direccionRepository.existsByCalleAndNumeroAndCiudadAndProvinciaAndPais(calle, numero, ciudad, provincia, pais);
+    public boolean direccionExists(String calle, String numero, String localidad, String provincia, String pais) {
+        return direccionRepository.existsByCalleAndNumeroAndLocalidaddAndProvinciaAndPais(calle, numero, localidad, provincia, pais);
     }
 
     @Override
