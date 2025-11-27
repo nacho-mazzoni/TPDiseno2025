@@ -12,6 +12,7 @@ import com.Diseno.TPDiseno2025.Domain.Huesped;
 import com.Diseno.TPDiseno2025.Model.DireccionDTO;
 import com.Diseno.TPDiseno2025.Model.HuespedDTO;
 import com.Diseno.TPDiseno2025.Repository.HuespedRepository;
+import com.Diseno.TPDiseno2025.Util.NotFoundException;
 
 @Service
 public class HuespedServiceImp implements HuespedService {
@@ -35,12 +36,19 @@ public class HuespedServiceImp implements HuespedService {
 
     @Override
     public Huesped buscarHuespedByTipoDniAndDni(String tipodni, Integer dni){
-        return huespedRepository.findByTipoDniAndDni(tipodni, dni).get();
+        return huespedRepository.findByTipoDniAndDni(tipodni, dni)
+                .orElseThrow(() -> 
+                new NotFoundException("Huesped no enconrtrado"));
     }
 
     @Override
     public HuespedDTO buscarHuespedDTOByTipoDniAndDni(String tipodni, Integer dni){
-        return mapToDTO(buscarHuespedByTipoDniAndDni(tipodni, dni), new HuespedDTO());
+        Huesped h = huespedRepository.findByTipoDniAndDni(tipodni, dni)
+            .orElseThrow(() -> 
+                new NotFoundException("Huésped no encontrado")
+            );
+
+        return mapToDTO(h, new HuespedDTO());
     }
 
     @Override
@@ -61,14 +69,14 @@ public class HuespedServiceImp implements HuespedService {
         if(huespedRepository.findByTipoDniAndDni(tipoDni, dni) != null){
             huespedRepository.delete(huespedRepository.findByTipoDniAndDni(tipoDni, dni).get());
         } else{
-            // throws huesped no encontrado exception
+            throw(new NotFoundException("Huesped no encontrado"));
         }
     }
 
     @Override
     public Huesped obtenerHuesped(String tipoDni, Integer dni) {
         return huespedRepository.findByTipoDniAndDni(tipoDni, dni)
-                .orElse(null); // o .orElseThrow(...)
+                .orElseThrow(() -> new NotFoundException("Huesped no encontrado"));
     }
 
     @Override
@@ -139,8 +147,10 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
-    public Huesped buscarHuespedByNombreAndapellidoAndTipoDniAndDni(String nombre, String apellido, String tipoDoc, Integer dni){
-        return this.huespedRepository.findByNombreAndApellidoAndTipoDniAndDni(nombre, apellido, tipoDoc, dni);
+    public HuespedDTO buscarHuespedByNombreAndapellidoAndTipoDniAndDni(String nombre, String apellido, String tipodni, Integer dni){
+        try{
+            Huesped huesped = huespedRepository.findByNombreAndapellidoAndTipoDniAndDni()
+        }
     }
 
     @Override

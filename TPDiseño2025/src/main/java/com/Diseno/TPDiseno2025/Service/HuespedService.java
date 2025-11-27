@@ -18,7 +18,7 @@ public interface HuespedService {
     List<Huesped> obtenerTodos();
     List<HuespedDTO> obtenerTodosDTO();
     void DarDeAltaHuesped(HuespedDTO dto);
-    Huesped buscarHuespedByNombreAndapellidoAndTipoDniAndDni(
+    HuespedDTO buscarHuespedByNombreAndapellidoAndTipoDniAndDni(
         String nombre,
         String apellido,
         String tipoDoc,

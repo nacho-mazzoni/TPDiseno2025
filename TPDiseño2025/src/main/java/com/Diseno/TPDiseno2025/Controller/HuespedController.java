@@ -34,18 +34,18 @@ public class HuespedController {
 
     private final HuespedService huespedservice;
 
-    private HuespedController(final HuespedService huespedservice){
+    public HuespedController(final HuespedService huespedservice){
         this.huespedservice = huespedservice;
     }
 
-    @GetMapping("/api/huespedes/{dni}/{tipodni}")
+    @GetMapping("/api/huespedes")
     public String getAllHuespedes(Model model) {
         List<HuespedDTO> huespedes = huespedservice.obtenerTodosDTO();
         model.addAttribute("huespedes", huespedes);
         return "huespedes";
     }
     
-    @GetMapping("/api/huespedes/dni")
+    @GetMapping("/api/huespedes/{tipodni}/{dni}")
     public ResponseEntity<HuespedDTO> getHuespedByTipoDniAndDni(@RequestParam @NotNull final String tipodni, @RequestParam @NotNull final Integer dni) {
         return ResponseEntity.ok(huespedservice.buscarHuespedDTOByTipoDniAndDni(tipodni, dni));
     }
@@ -55,6 +55,18 @@ public class HuespedController {
         List<HuespedDTO> huespedes = huespedservice.getByNombreDTO(nombre);
         model.addAttribute("huespedes", huespedes);
         return "huespedes";
+    }
+
+    @GetMapping("/api/huespedes/buscar")
+    public ResponseEntity<HuespedDTO> buscarCompleto(
+        @RequestParam String nombre,
+        @RequestParam String apellido,
+        @RequestParam Integer dni,
+        @RequestParam String tipodni
+    ) {
+        return ResponseEntity.ok(
+            huespedservice.buscarHuespedByNombreAndapellidoAndTipoDniAndDni(nombre, apellido, tipodni, dni)
+        );
     }
 
     @PostMapping("/api/huepedes")
