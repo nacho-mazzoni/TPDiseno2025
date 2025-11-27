@@ -38,7 +38,7 @@ public class HuespedController {
         this.huespedservice = huespedservice;
     }
 
-    @GetMapping("/api/huespedes")
+    @GetMapping("/api/huespedes/{dni}/{tipodni}")
     public String getAllHuespedes(Model model) {
         List<HuespedDTO> huespedes = huespedservice.obtenerTodosDTO();
         model.addAttribute("huespedes", huespedes);
@@ -66,7 +66,7 @@ public class HuespedController {
     }
 
 
-    @PutMapping("/api/huespedes/{dni, tipodni}")
+    @PutMapping("/api/huespedes/{dni}/{tipodni}")
     // Agregar api response
     @ResponseBody
     public ResponseEntity<Integer> updateHuesped(@PathVariable(name = "dni") final Integer dni, 
@@ -75,7 +75,7 @@ public class HuespedController {
         return ResponseEntity.ok(dni);
     }
 
-    @DeleteMapping("/api/huespedes/{dni, tipodni}")
+    @DeleteMapping("/api/huespedes/{dni}/{tipodni}")
     //agregar api response
     @ResponseBody
     public ResponseEntity<Void> deleteHuesped(@PathVariable(name = "dni") final Integer dni, @PathVariable(name = "tipodni") final String tipodni){

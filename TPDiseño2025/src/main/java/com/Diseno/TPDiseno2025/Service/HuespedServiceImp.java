@@ -140,7 +140,7 @@ public class HuespedServiceImp implements HuespedService {
 
     @Override
     public Huesped buscarHuespedByNombreAndapellidoAndTipoDniAndDni(String nombre, String apellido, String tipoDoc, Integer dni){
-        return this.huespedRepository.findByNombreAndApellidoAndTipoDniAndDniStartingWithIgnoreCase(nombre, apellido, tipoDoc, dni);
+        return this.huespedRepository.findByNombreAndApellidoAndTipoDniAndDni(nombre, apellido, tipoDoc, dni);
     }
 
     @Override
