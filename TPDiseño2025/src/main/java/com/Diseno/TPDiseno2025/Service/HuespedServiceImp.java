@@ -148,9 +148,9 @@ public class HuespedServiceImp implements HuespedService {
 
     @Override
     public HuespedDTO buscarHuespedByNombreAndapellidoAndTipoDniAndDni(String nombre, String apellido, String tipodni, Integer dni){
-        try{
-            Huesped huesped = huespedRepository.findByNombreAndapellidoAndTipoDniAndDni()
-        }
+        Huesped h = huespedRepository.findByNombreAndApellidoAndTipoDniAndDni(nombre, apellido, tipodni, dni)
+                    .orElseThrow(() -> new NotFoundException("Huesped no encontrado"));
+        return this.mapToDTO(h, new HuespedDTO());
     }
 
     @Override
