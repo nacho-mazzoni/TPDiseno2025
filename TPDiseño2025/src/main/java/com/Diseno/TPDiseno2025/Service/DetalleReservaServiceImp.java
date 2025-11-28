@@ -14,7 +14,7 @@ import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
 
 @Service
 public class DetalleReservaServiceImp implements DetalleReservaService {
-    
+
     @Autowired
     private DetalleReservaRepository detalleReservaRepository;
 
@@ -23,7 +23,7 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
     private TipoHabitacionService tipoHabService;
 
     @Override
-    public void crearDetalle_Reserva(Integer idDetalle, ReservaDTO r, HabitacionDTO h){
+    public void crearDetalle_Reserva(Integer idDetalle, ReservaDTO r, HabitacionDTO h) {
         DetalleReserva detalle = new DetalleReserva();
         detalle.setIdDetalle(idDetalle);
         detalle.setReserva(reservaService.mapToEntity(r));
@@ -34,27 +34,27 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
     }
 
     @Override
-    public DetalleReserva obtenerDetalleByIdReservaAndIdHabitacion(Integer r, Integer h){
+    public DetalleReserva obtenerDetalleByIdReservaAndIdHabitacion(Integer r, Integer h) {
         return detalleReservaRepository.findByReserva_IdReservaAndHabitacion_IdHabitacion(r, h);
     }
 
     @Override
-    public DetalleReserva obtenerDetalle(Integer idDetalle){
+    public DetalleReserva obtenerDetalle(Integer idDetalle) {
         return detalleReservaRepository.getById(idDetalle);
     }
 
-    @Override 
-    public void eliminarDetalle(Integer idDetalle){
+    @Override
+    public void eliminarDetalle(Integer idDetalle) {
         detalleReservaRepository.deleteById(idDetalle);
     }
 
     @Override
-    public List<DetalleReserva> obtenerTodos(){
+    public List<DetalleReserva> obtenerTodos() {
         return detalleReservaRepository.findAll();
     }
 
     @Override
-    public void darDeBajaHabitacion(Integer idDetalle, Habitacion h){
+    public void darDeBajaHabitacion(Integer idDetalle, Habitacion h) {
         detalleReservaRepository.delete(detalleReservaRepository.findById(idDetalle).get());
     }
 }

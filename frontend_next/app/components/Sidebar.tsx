@@ -44,7 +44,7 @@ export default function Sidebar() {
             🏠 Inicio
           </Link>
           
-          <Link href="/dashboard/huespedes" className={getLinkClass('/dashboard/huespedes')}>
+          <Link href="/dashboard/huesped" className={getLinkClass('/dashboard/huesped')}>
             👥 Huéspedes
           </Link>
 
