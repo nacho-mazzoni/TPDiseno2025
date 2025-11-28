@@ -23,10 +23,10 @@ public class Huesped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer dni;
 
-    @Column(name = "nombre_huesped", nullable = false)
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Column(name = "apellido_huesped", nullable = false)
+    @Column(name = "apellido", nullable = false)
     private String apellido;
 
     @Column(name = "tipodni", nullable = false)
@@ -41,7 +41,7 @@ public class Huesped {
     @Column(name = "ocupacion", nullable = false)
     private String ocupacion;
 
-    @Column(name ="email", nullable = true)
+    @Column(name ="mail", nullable = true)
     private String email;
 
     @Column(name = "pos_iva", nullable = true)

@@ -21,7 +21,7 @@ public class DireccionDTO {
     private String departamento;
 
     @Size(max = 10)
-    private String piso;
+    private Integer piso;
 
     @NotNull
     private Integer codPostal;

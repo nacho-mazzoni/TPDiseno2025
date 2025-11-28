@@ -36,7 +36,7 @@ public class HuespedController {
         this.huespedservice = huespedservice;
     }
 
-    @GetMapping("") 
+    @GetMapping("/") 
     public ResponseEntity<List<HuespedDTO>> getAllHuespedes() {
         List<HuespedDTO> huespedes = huespedservice.obtenerTodosDTO();
         return ResponseEntity.ok(huespedes);

@@ -45,7 +45,7 @@ export default function BuscarHuespedPage() {
     try {
       let url = 'http://localhost:8081/huespedes/';
 
-      if (filtros.dni) {
+      if (filtros.dni && filtros.dni.trim() != '') {
         url = `http://localhost:8081/huespedes/${filtros.tipoDni}/${filtros.dni}`;
       } else if (filtros.nombre) {
         url = `http://localhost:8081/huespedes/nombre?nombre=${filtros.nombre}`;
@@ -68,7 +68,6 @@ export default function BuscarHuespedPage() {
 
     } catch (err: any) {
       setError(err.message);
-      setBusquedaRealizada(true); // Mostramos el error
     } finally {
       setLoading(false);
     }

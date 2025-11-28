@@ -37,7 +37,7 @@ public class DireccionServiceImp implements DireccionService {
     }
 
     @Override
-    public boolean direccionExists(String calle, Integer numero, String departamento, String piso, Integer codPostal) {
+    public boolean direccionExists(String calle, Integer numero, String departamento, Integer piso, Integer codPostal) {
         DireccionId id = new DireccionId();
         id.setCalle(calle);
         id.setNumero(numero);

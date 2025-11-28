@@ -23,7 +23,7 @@ public class DireccionId implements Serializable {
     @Column(name = "departamento")
     private String departamento;
     @Column(name = "piso")
-    private String piso;
+    private Integer piso;
     @Column(name = "cod_postal")
     private Integer codPostal;
 
