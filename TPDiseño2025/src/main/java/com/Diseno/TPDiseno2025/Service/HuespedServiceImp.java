@@ -53,7 +53,7 @@ public class HuespedServiceImp implements HuespedService {
 
     @Override
     public void modificarHuesped(String tipoDni, Integer numOriginal, Huesped hActualizado) {
-        Huesped existente = obtenerHuesped(tipoDni, numOriginal);
+        Huesped existente = buscarHuespedByTipoDniAndDni(tipoDni, numOriginal);
 
         
         existente.setNombre(hActualizado.getNombre());
@@ -71,12 +71,6 @@ public class HuespedServiceImp implements HuespedService {
         } else{
             throw(new NotFoundException("Huesped no encontrado"));
         }
-    }
-
-    @Override
-    public Huesped obtenerHuesped(String tipoDni, Integer dni) {
-        return huespedRepository.findByTipoDniAndDni(tipoDni, dni)
-                .orElseThrow(() -> new NotFoundException("Huesped no encontrado"));
     }
 
     @Override
@@ -205,6 +199,16 @@ public class HuespedServiceImp implements HuespedService {
            // throws(new HuespedNotfoundException());
         }
         huespedRepository.save(this.mapToEntity(new Huesped(), hDTO));
+    }
+
+    @Override
+    public Boolean existeHuesped(Huesped h){
+        return huespedRepository.existsByDni(h.getDni());
+    }
+
+    @Override
+    public Huesped findById(Integer idHuesped){
+        return huespedRepository.findById(idHuesped).get();
     }
 }
 

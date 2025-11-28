@@ -63,4 +63,32 @@ public class HabitacionServiceImp implements HabitacionService{
         }
         return estadosHabitaciones;
     }
+
+    @Override
+    public Boolean verificarEstadoHabitacion(Integer idHabitacion){
+        if(habitacionRepository.existsById(idHabitacion)){
+            return (habitacionRepository.findById(idHabitacion).get().getEstado().equalsIgnoreCase("disponible"));
+        }else{
+            return false;
+        }
+    }
+
+    @Override 
+    public void reservarHabitacion(Integer idHabitacion){
+        if(this.verificarEstadoHabitacion(idHabitacion)){
+            habitacionRepository.findById(idHabitacion).get().setEstado("reservada");
+        }else{
+            throw(new RuntimeException("Habitacion no disponible"));
+        }
+    }
+
+    @Override
+    public Habitacion buscarHabitacionByIdHabitacion(Integer idHabitacion){
+        return habitacionRepository.findById(idHabitacion).get();
+    }
+
+    @Override 
+    public HabitacionDTO buscarHabitacionDTOByIdHabitacion(Integer idHabitacion){
+        return this.mapToDTOHabitacion(habitacionRepository.findById(idHabitacion).get());
+    }
 }

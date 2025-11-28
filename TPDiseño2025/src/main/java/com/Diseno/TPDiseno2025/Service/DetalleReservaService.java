@@ -1,5 +1,6 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.Diseno.TPDiseno2025.Domain.DetalleReserva;
@@ -15,5 +16,6 @@ public interface DetalleReservaService {
     DetalleReserva obtenerDetalleByIdReservaAndIdHabitacion(Integer idReserva, Integer idHabitacion);
     DetalleReserva obtenerDetalle(Integer idDetalle);
     List<DetalleReserva> obtenerTodos();
-
+    void guardarDetalle(DetalleReserva dr);
+    List<DetalleReserva> buscarReservasEnConflicto(LocalDate fechaInicio, LocalDate fechaFin);
 }

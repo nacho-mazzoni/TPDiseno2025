@@ -1,5 +1,6 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,12 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
     @Autowired
     private DetalleReservaRepository detalleReservaRepository;
 
-    private ReservaService reservaService;
+    @Autowired
     private HabitacionRepository habitacionRepository;
-    private TipoHabitacionService tipoHabService;
+
+    private ReservaService reservaService = new ReservaServiceImp();
+    
+    private TipoHabitacionService tipoHabService = new TipoHabitacionServiceImp();
 
     @Override
     public void crearDetalle_Reserva(Integer idDetalle, ReservaDTO r, HabitacionDTO h) {
@@ -56,5 +60,15 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
     @Override
     public void darDeBajaHabitacion(Integer idDetalle, Habitacion h) {
         detalleReservaRepository.delete(detalleReservaRepository.findById(idDetalle).get());
+    }
+
+    @Override
+    public void guardarDetalle(DetalleReserva dr){
+        detalleReservaRepository.save(dr);
+    }
+
+    @Override
+    public List<DetalleReserva> buscarReservasEnConflicto(LocalDate fechaInicio, LocalDate fechaFin){
+        return detalleReservaRepository.findReservasEnRango(fechaInicio, fechaFin);
     }
 }

@@ -9,8 +9,11 @@ public interface HabitacionService {
     
     void crearHabitacion(Integer idHabitacion, Integer idTipo, Integer nochesDesc, String estado);
     HabitacionDTO mapToDTOHabitacion(Habitacion h);
+    Habitacion buscarHabitacionByIdHabitacion(Integer idHabitacion);
+    HabitacionDTO buscarHabitacionDTOByIdHabitacion(Integer idHabitacion);
     Habitacion mapToEntHabitacion(HabitacionDTO hDto);
     List<Habitacion> obtenerTodas();
     List<String> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta);
-
+    Boolean verificarEstadoHabitacion(Integer idHabitacion); 
+    void reservarHabitacion(Integer idHabitacion);
 }
