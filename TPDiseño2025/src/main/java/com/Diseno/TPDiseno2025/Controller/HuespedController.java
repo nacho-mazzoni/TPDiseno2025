@@ -1,12 +1,11 @@
 package com.Diseno.TPDiseno2025.Controller;
 
-// import isi.deso.tp_spring.util.NotFoundException;
+//import isi.deso.tp_spring.Util.NotFoundException;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,8 +15,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.Diseno.TPDiseno2025.Model.HuespedDTO;
 import com.Diseno.TPDiseno2025.Service.HuespedService;
@@ -27,7 +28,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @CrossOrigin(origins = "http://localhost:3000")
-@Controller
+@RestController
+@RequestMapping("/api/huespedes")
 public class HuespedController {
     
     Logger logger = org.slf4j.LoggerFactory.getLogger(HuespedController.class);
@@ -38,7 +40,7 @@ public class HuespedController {
         this.huespedservice = huespedservice;
     }
 
-    @GetMapping("/api/huespedes")
+    @GetMapping("/")
     public String getAllHuespedes(Model model) {
         List<HuespedDTO> huespedes = huespedservice.obtenerTodosDTO();
         model.addAttribute("huespedes", huespedes);
@@ -69,8 +71,7 @@ public class HuespedController {
         );
     }
 
-    @PostMapping("/api/huepedes")
-    //Agregar api response
+    @PostMapping("/")
     @ResponseBody
     public ResponseEntity<Integer> createHuesped(@RequestBody @Valid HuespedDTO huespedDTO) {
         Integer createdId = huespedservice.crearHuespedDTO(huespedDTO);
@@ -79,7 +80,6 @@ public class HuespedController {
 
 
     @PutMapping("/api/huespedes/{dni}/{tipodni}")
-    // Agregar api response
     @ResponseBody
     public ResponseEntity<Integer> updateHuesped(@PathVariable(name = "dni") final Integer dni, 
                         @PathVariable(name = "tipodni") final String tipodni, @RequestParam @Valid final HuespedDTO huespedDTO) {
@@ -88,7 +88,6 @@ public class HuespedController {
     }
 
     @DeleteMapping("/api/huespedes/{dni}/{tipodni}")
-    //agregar api response
     @ResponseBody
     public ResponseEntity<Void> deleteHuesped(@PathVariable(name = "dni") final Integer dni, @PathVariable(name = "tipodni") final String tipodni){
         huespedservice.eliminarHuespedByTipoDniAndDni(tipodni, dni);

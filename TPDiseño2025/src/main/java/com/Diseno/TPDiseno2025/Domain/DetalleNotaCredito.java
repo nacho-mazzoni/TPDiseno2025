@@ -23,7 +23,7 @@ public class DetalleNotaCredito {
     @Id
     @Column
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer idNota;
+    private Integer idDetalleNota;
 
     @OneToOne
     @JoinColumn(name = "id_notacredito", referencedColumnName = "id_notacredito", nullable = false)
@@ -34,5 +34,5 @@ public class DetalleNotaCredito {
     private Factura factura;
 
     @Column(nullable = false)
-    private Double monto_aplicado;
+    private Double montoAplicado;
 }
