@@ -37,7 +37,7 @@ public class DireccionServiceImp implements DireccionService {
     }
 
     @Override
-    public boolean direccionExists(String calle, Integer numero, String departamento, Integer piso, Integer codPostal) {
+    public Boolean direccionExists(String calle, Integer numero, String departamento, Integer piso, Integer codPostal) {
         DireccionId id = new DireccionId();
         id.setCalle(calle);
         id.setNumero(numero);
@@ -74,6 +74,17 @@ public class DireccionServiceImp implements DireccionService {
         dDTO.setProvincia(d.getProvincia());
         dDTO.setPais(d.getPais());
         return dDTO;
+    }
+
+    @Override
+    public DireccionId crearDireccionId(String calle, Integer numero, String departamento, Integer piso, Integer codPostal){
+        DireccionId dId = new DireccionId();
+        dId.setCalle(calle);
+        dId.setNumero(numero);
+        dId.setDepartamento(departamento);
+        dId.setPiso(piso);
+        dId.setCodPostal(codPostal);
+        return dId;
     }
 
 }

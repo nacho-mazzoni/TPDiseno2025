@@ -29,14 +29,17 @@ public interface DetalleReservaRepository extends JpaRepository<DetalleReserva, 
     DetalleReserva findByReserva_IdReservaAndHabitacion_IdHabitacion(Integer idReserva, Integer IdHabitacion);
 
     // Esta query busca todos los detalles de reservas activas que chocan con las fechas solicitadas
-    @Query("SELECT d FROM DetalleReserva d " +
-           "JOIN d.reserva r " +
-           "WHERE r.estado != 'CANCELADA' " +
-           "AND (" +
-           "   (r.fechaInicio <= :fechaFin AND r.fechaInicio >= :fechaInicio) OR " +
-           "   (r.fechaInicio <= :fechaInicio AND DATE_ADD(r.fechaInicio, r.cantNoches) >= :fechaInicio)" +
-           ")")
-    List<DetalleReserva> findReservasEnRango(@Param("fechaInicio") LocalDate fechaInicio, 
-                                             @Param("fechaFin") LocalDate fechaFin);
+    @Query(value = "SELECT d.* FROM detalle_reserva d " +
+                   "JOIN reserva r ON d.id_reserva = r.id_reserva " +
+                   "WHERE r.estado != 'CANCELADA' " +
+                   "AND (" +
+                   "   r.fecha_inicio < :fechaFin " +
+                   "   AND " +
+                   // LÓGICA POSTGRESQL: fecha + (numero * intervalo de 1 dia)
+                   "   (r.fecha_inicio + (r.cant_noches * INTERVAL '1 day')) > :fechaInicio " +
+                   ")", nativeQuery = true)
+    List<DetalleReserva> findReservasEnRango(
+            @Param("fechaInicio") LocalDate fechaInicio, 
+            @Param("fechaFin") LocalDate fechaFin);
 
 }

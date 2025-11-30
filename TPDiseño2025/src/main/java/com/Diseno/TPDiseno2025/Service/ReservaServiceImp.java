@@ -15,45 +15,56 @@ import com.Diseno.TPDiseno2025.Model.CeldaCalendarioDTO;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
 import com.Diseno.TPDiseno2025.Model.HuespedDTO;
 import com.Diseno.TPDiseno2025.Model.ReservaDTO;
-import com.Diseno.TPDiseno2025.Model.CeldaCalendarioDTO;
-import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
 import com.Diseno.TPDiseno2025.Repository.ReservaRepository;
 
 
 
 @Service
 public class ReservaServiceImp implements ReservaService {
-    private HuespedService huespedService = new HuespedServiceImp();
-    private HabitacionService habitacionService = new HabitacionServiceImp();
-    private DetalleReservaService detalleService = new DetalleReservaServiceImp();
+    
+    @Autowired
+    private HuespedService huespedService;
+    
+    @Autowired
+    private HabitacionService habitacionService;
+    
+    
+    @Autowired
+    private DetalleReservaService detalleService;
 
     @Autowired
     private ReservaRepository reservaRepository;
 
-    @Override
+    @Override   
     public void crearReserva(ReservaDTO r, HuespedDTO h, HabitacionDTO habitacion) {
         
-        Reserva nuevaReserva = this.mapToEntity(r);
-        if(huespedService.existeHuesped(huespedService.mapToEntity(new Huesped(), h))){
-            Huesped huesped = huespedService.mapToEntity(new Huesped(), h);
-            nuevaReserva.setHuesped(huespedService.buscarHuespedByTipoDniAndDni(h.getTipoDni(), h.getDni()));
-        }else{
-            huespedService.crearHuesped(huespedService.mapToEntity(new Huesped(), h));
-            nuevaReserva.setHuesped(huespedService.buscarHuespedByTipoDniAndDni(h.getTipoDni(), h.getDni()));
-        }
+        // 1. Buscamos al huésped. 
+        // Como tu HuespedService lanza 'NotFoundException' si no lo encuentra, 
+        // esto cortará el flujo automáticamente con un error 404 si el DNI no existe.
+        Huesped huespedExistente = huespedService.buscarHuespedByTipoDniAndDni(h.getTipoDni(), h.getDni());
 
+        // 2. Mapeamos la reserva
+        Reserva nuevaReserva = this.mapToEntity(r);
+        
+        // 3. Asignamos el huésped REAL que trajimos de la BD
+        nuevaReserva.setHuesped(huespedExistente);
+
+        // 4. Guardamos la Reserva
         reservaRepository.save(nuevaReserva);
 
+        // 5. Guardamos el Detalle
         DetalleReserva detalle = new DetalleReserva();
         detalle.setReserva(nuevaReserva);
     
-        Habitacion hab = habitacionService.buscarHabitacionByIdHabitacion(habitacion.getIdHabitacion());
-        detalle.setHabitacion(hab);
+        // Buscamos la habitación real para asegurar consistencia
+        Habitacion habReal = habitacionService.buscarHabitacionByIdHabitacion(habitacion.getIdHabitacion());
+        detalle.setHabitacion(habReal);
     
-        // Asumimos que el precio viene de la habitación o se calcula
-        detalle.setPrecio(hab.getIdTipo().getPrecioNoche() * r.getCantNoches()); 
+        // Precio y Noches
+        detalle.setPrecio(habReal.getIdTipo().getPrecioNoche() * r.getCantNoches()); 
         detalle.setCantidadNoches(r.getCantNoches());
 
+        // Guardamos el detalle sin dependencias circulares
         detalleService.guardarDetalle(detalle);
     }
 
@@ -87,7 +98,7 @@ public class ReservaServiceImp implements ReservaService {
     public Reserva mapToEntity(ReservaDTO r){
         Reserva reserva = new Reserva();
         reserva.setIdReserva(r.getIdReserva());
-        reserva.setHuesped(huespedService.findById(r.getIdHuesped()));
+        //reserva.setHuesped(huespedService.findById(r.getIdHuesped()));
         reserva.setCantHuesped(r.getCantHuesped());
         reserva.setFechaInicio(LocalDate.parse(r.getFechaInicio()));
         reserva.setCantNoches(r.getCantNoches());

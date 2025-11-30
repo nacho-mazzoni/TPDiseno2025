@@ -5,28 +5,29 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 
 @Entity
+@Table(name = "tipohabitacion")
 @Getter
 @Setter
 public class TipoHabitacion {
     @Id
-    @Column(nullable = false, updatable = false)
+    @Column(name = "idtipo", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idTipo;
 
-    @Column(nullable = false)
+    @Column(name = "nombretipo", nullable = false)
     private String nombreTipo;
 
-    @Column(nullable = false)
+    @Column(name = "precio_x_noche", nullable = false)
     private Double precioNoche;
 
-    @Column(nullable = false)
+    @Column(name = "cantidaddisponible", nullable = false)
     private Integer cantidadDisponible;
-
 
     public TipoHabitacion(){}
 

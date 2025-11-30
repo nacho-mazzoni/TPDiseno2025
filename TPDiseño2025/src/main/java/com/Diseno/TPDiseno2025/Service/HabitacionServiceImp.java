@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.Diseno.TPDiseno2025.Domain.Habitacion;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
 import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
 
 
-
+@Service
 public class HabitacionServiceImp implements HabitacionService{
 
     @Autowired
     private HabitacionRepository habitacionRepository;
 
+    @Autowired
     private TipoHabitacionService tipoHabitacionService;
 
     @Override

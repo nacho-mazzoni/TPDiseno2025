@@ -55,6 +55,18 @@ public class HuespedController {
         return ResponseEntity.ok(huespedes);
     }
 
+    @GetMapping("/getByDni") // Ejemplo: GET /huesped/getByDni?dni=12345
+    public ResponseEntity<?> getHuespedByDni(@RequestParam("dni") Integer dni) {
+    try {
+        // Asumiendo que tienes un método así en tu servicio. 
+        // Si no, usa repository.findByDni(dni)
+        HuespedDTO huesped = huespedservice.buscarHuespedDTOByTipoDniAndDni("DNI", dni); 
+        return ResponseEntity.ok(huesped);
+    } catch (Exception e) {
+        // Si no lo encuentra, devolvemos 404
+        return ResponseEntity.notFound().build();
+    }
+}
     
     @GetMapping("/buscar")
     public ResponseEntity<HuespedDTO> buscarCompleto(
@@ -69,7 +81,7 @@ public class HuespedController {
     }
 
 
-    @PostMapping("")
+    @PostMapping("/crear")
     public ResponseEntity<Integer> createHuesped(@RequestBody @Valid HuespedDTO huespedDTO) {
         Integer createdId = huespedservice.crearHuespedDTO(huespedDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdId);

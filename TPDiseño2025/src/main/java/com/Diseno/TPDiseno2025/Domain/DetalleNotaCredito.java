@@ -16,12 +16,12 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "detalle_nota_credito", uniqueConstraints = {
+@Table(name = "detalle_notacredito", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"id_notacredito", "id_factura"})
 })
 public class DetalleNotaCredito {
     @Id
-    @Column
+    @Column(name = "id_detallenota")
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer idDetalleNota;
 
@@ -33,6 +33,6 @@ public class DetalleNotaCredito {
     @JoinColumn(name = "id_factura", referencedColumnName = "id_factura", nullable = false)
     private Factura factura;
 
-    @Column(nullable = false)
+    @Column(name = "monto_aplicado", nullable = false)
     private Double montoAplicado;
 }

@@ -30,6 +30,14 @@ public class HuespedServiceImp implements HuespedService {
 
     @Override
     public Integer crearHuespedDTO(HuespedDTO hDTO){
+        DireccionDTO dirDTO = hDTO.getDireccion();
+        Direccion dir = new Direccion();
+        if(direccionService.direccionExists(dirDTO.getCalle(), dirDTO.getNumero(), dirDTO.getDepartamento(), dirDTO.getPiso(),dirDTO.getCodPostal())){
+            dir = direccionService.mapToEntDireccion(dirDTO);
+        }else{
+            DireccionId dirId = direccionService.crearDireccionId(dirDTO.getCalle(), dirDTO.getNumero(), dirDTO.getDepartamento(), dirDTO.getPiso(), dirDTO.getCodPostal());
+            direccionService.crearDireccion(dirId, dirDTO);
+        }
         huespedRepository.save(this.mapToEntity(new Huesped(), hDTO));
         return huespedRepository.findById(hDTO.getDni()).get().getDni();
     }

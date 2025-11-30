@@ -22,7 +22,7 @@ import lombok.Setter;
 public class DetalleReserva {
     
     @Id
-    @Column(nullable=false)
+    @Column(name = "id_detalle", nullable=false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idDetalle;
 
@@ -31,10 +31,10 @@ public class DetalleReserva {
     @NotNull
     private Habitacion habitacion;
 
-    @Column(nullable = false)
+    @Column(name = "precio", nullable = false)
     private Double precio;
 
-    @Column(nullable = false)
+    @Column(name = "cantidad_noches", nullable = false)
     private Integer cantidadNoches;
 
     @OneToOne

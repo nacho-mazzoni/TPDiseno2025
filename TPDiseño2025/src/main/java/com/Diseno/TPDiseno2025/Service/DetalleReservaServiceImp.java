@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.Diseno.TPDiseno2025.Domain.DetalleReserva;
 import com.Diseno.TPDiseno2025.Domain.Habitacion;
+import com.Diseno.TPDiseno2025.Domain.Reserva;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
-import com.Diseno.TPDiseno2025.Model.ReservaDTO;
 import com.Diseno.TPDiseno2025.Repository.DetalleReservaRepository;
 import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
 
@@ -21,16 +21,15 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
 
     @Autowired
     private HabitacionRepository habitacionRepository;
-
-    private ReservaService reservaService = new ReservaServiceImp();
     
-    private TipoHabitacionService tipoHabService = new TipoHabitacionServiceImp();
+    @Autowired
+    private TipoHabitacionService tipoHabService;
 
     @Override
-    public void crearDetalle_Reserva(Integer idDetalle, ReservaDTO r, HabitacionDTO h) {
+    public void crearDetalle_Reserva(Integer idDetalle, Reserva r, HabitacionDTO h) {
         DetalleReserva detalle = new DetalleReserva();
         detalle.setIdDetalle(idDetalle);
-        detalle.setReserva(reservaService.mapToEntity(r));
+        detalle.setReserva(r);
         detalle.setHabitacion(habitacionRepository.findById(h.getIdHabitacion()).get());
         detalle.setCantidadNoches(r.getCantNoches());
         detalle.setPrecio(tipoHabService.getPrecioByTipo(h.getIdTipo()));
@@ -59,7 +58,7 @@ public class DetalleReservaServiceImp implements DetalleReservaService {
 
     @Override
     public void darDeBajaHabitacion(Integer idDetalle, Habitacion h) {
-        detalleReservaRepository.delete(detalleReservaRepository.findById(idDetalle).get());
+        detalleReservaRepository.delete(detalleReservaRepository.findById(idDetalle).orElseThrow());
     }
 
     @Override

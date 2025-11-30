@@ -17,7 +17,8 @@ public class JuridicaServiceImp implements JuridicaService{
     
     @Autowired
     private JuridicaRepository juridicaRepository;
- 
+    
+    @Autowired
     private DireccionService direccionService;
 
     @Override

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,8 +62,8 @@ public class ReservaController {
     // ENDPOINT 2: DISPONIBILIDAD (Soporta la Grilla de Colores)
     @GetMapping("/disponibilidad")
     public ResponseEntity<List<CeldaCalendarioDTO>> obtenerDisponibilidad(
-            @RequestParam("fechaInicio") String inicioStr,
-            @RequestParam("fechaFin") String finStr) {
+            @RequestParam("fechaInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String inicioStr,
+            @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String finStr) {
 
         LocalDate inicio = LocalDate.parse(inicioStr);
         LocalDate fin = LocalDate.parse(finStr);

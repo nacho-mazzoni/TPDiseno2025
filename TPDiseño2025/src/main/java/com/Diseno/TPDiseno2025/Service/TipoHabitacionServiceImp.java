@@ -1,9 +1,15 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import org.springframework.stereotype.Service;
+
 import com.Diseno.TPDiseno2025.Domain.TipoHabitacion;
 import com.Diseno.TPDiseno2025.Model.TipoHabitacionDTO;
 
+@Service
 public class TipoHabitacionServiceImp implements TipoHabitacionService{
+
+    //@Autowired
+    //private TipoHabitacionRepository tipoHabitacionRepository;
 
     @Override
     public Double getPrecioByTipo(Integer idTipo){

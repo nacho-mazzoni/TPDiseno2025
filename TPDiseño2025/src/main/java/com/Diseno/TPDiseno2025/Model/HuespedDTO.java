@@ -38,7 +38,7 @@ public class HuespedDTO {
     @NotNull
     private LocalDate fechaNacimiento;
 
-    @NotNull
+    
     private Integer edad;
 
     @NotBlank
