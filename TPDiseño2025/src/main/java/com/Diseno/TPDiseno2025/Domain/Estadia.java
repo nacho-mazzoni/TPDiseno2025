@@ -35,7 +35,7 @@ public class Estadia {
     private LocalTime horaCheckOut;
 
     @OneToOne
-    @JoinColumn(name="id_reserva", referencedColumnName="id_reserva", nullable=false)
+    @JoinColumn(name="id_reserva", referencedColumnName="id_reserva", nullable=true)
     private Reserva reserva;
 
     @ManyToOne

@@ -23,4 +23,5 @@ public class EstadiaController {
             return ResponseEntity.badRequest().body("Error al ocupar habitación: " + e.getMessage());
         }
     }
+    
 }
