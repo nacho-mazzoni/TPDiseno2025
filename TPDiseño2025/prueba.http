@@ -1,9 +1,0 @@
-### Prueba de Ocupar Habitación
-POST http://localhost:8081/estadia/ocupar
-Content-Type: application/json
-
-{
-  "idsHabitaciones": [1],
-  "dnisHuespedes": [18567345, 40987654],
-  "precio": 25000.00
-}
