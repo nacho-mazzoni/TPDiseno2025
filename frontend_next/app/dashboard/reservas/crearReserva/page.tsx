@@ -1,8 +1,8 @@
-// Ubicación: src/app/reservas/crearReserva/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Swal from 'sweetalert2'; 
 
 // --- TIPOS ---
 interface CeldaCalendario {
@@ -18,6 +18,12 @@ interface HuespedForm {
   telefono: string;
 }
 
+interface TipoHabitacion {
+    idTipo: number;
+    nombreTipo: string;
+    precioNoche: number;
+}
+
 export default function CrearReservaPage() {
     const router = useRouter();
     
@@ -29,6 +35,8 @@ export default function CrearReservaPage() {
     const [fechaDesde, setFechaDesde] = useState("");
     const [fechaHasta, setFechaHasta] = useState("");
     const [disponibilidad, setDisponibilidad] = useState<CeldaCalendario[]>([]);
+    const [tiposHabitacion, setTiposHabitacion] = useState<TipoHabitacion[]>([]);
+    const [tipoSeleccionado, setTipoSeleccionado] = useState<string>(""); 
     
     // Selección temporal
     const [seleccion, setSeleccion] = useState<{
@@ -46,51 +54,84 @@ export default function CrearReservaPage() {
         telefono: "",
     });
 
+    // Validación visual de fechas
+    const errorFechas = fechaDesde && fechaHasta && fechaHasta <= fechaDesde;
+
+    // --- CONFIGURACIÓN SWEETALERT (TOAST) ---
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
     useEffect(() => {
-        // Verificamos si hay una reserva pendiente en memoria
+        // Cargar tipos de habitación
+        const fetchTipos = async () => {
+            try {
+                const res = await fetch("http://localhost:8081/tiposhabitacion");
+                if (res.ok) {
+                    const data = await res.json();
+                    setTiposHabitacion(data);
+                }
+            } catch (error) {
+                console.error("Error cargando tipos:", error);
+            }
+        };
+        fetchTipos();
+
+        // Verificar reserva pendiente (si vuelve de crear huesped)
         const reservaPendiente = localStorage.getItem("reservaPendiente");
         
         if (reservaPendiente) {
             const data = JSON.parse(reservaPendiente);
-            
-            // Restauramos los datos
             setSeleccion(data.seleccion);
             setHuesped(prev => ({ ...prev, dni: data.dni }));
             setFechaDesde(data.seleccion.fechaInicio);
             setFechaHasta(data.seleccion.fechaFin);
-            
-            // Avanzamos directo al paso 3 (Confirmación)
             setPaso(3);
-            
-            // Opcional: Volver a buscar disponibilidad para asegurar que se pinte la grilla
-            // buscarDisponibilidad(); 
         }
     }, []);
 
     // --- LOGICA PASO 1: MOSTRAR ESTADO HABITACIONES ---
     const buscarDisponibilidad = async () => {
         if(!fechaDesde || !fechaHasta) {
-            alert("Por favor seleccione un rango de fechas.");
+            Toast.fire({
+                icon: "warning",
+                title: "Por favor seleccione un rango de fechas."
+            });
             return;
         }
         setLoading(true);
         try {
-        // CORRECCIÓN: Puerto 8081
-        const res = await fetch(`http://localhost:8081/reservas/disponibilidad?fechaInicio=${fechaDesde}&fechaFin=${fechaHasta}`);
-        if (!res.ok) throw new Error("Error al conectar con backend");
-        const data = await res.json();
-        setDisponibilidad(data);
+            let url = `http://localhost:8081/reservas/disponibilidad?fechaInicio=${fechaDesde}&fechaFin=${fechaHasta}`;
+            
+            if (tipoSeleccionado) {
+                url += `&idTipo=${tipoSeleccionado}`;
+            }
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Error al conectar con backend");
+            const data = await res.json();
+            setDisponibilidad(data);
         } catch (e) {
-        console.error(e);
-        alert("Error al buscar disponibilidad. Verifica que el backend esté corriendo en el puerto 8081.");
+            console.error(e);
+            Swal.fire("Error", "No se pudo conectar con el servidor.", "error");
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
     };
 
     const seleccionarCelda = (celda: CeldaCalendario) => {
         if (celda.estado !== "LIBRE") {
-            alert("La habitación seleccionada no está disponible.");
+            Toast.fire({
+                icon: "error",
+                title: "La habitación seleccionada no está disponible."
+            });
             return;
         }
 
@@ -117,43 +158,51 @@ export default function CrearReservaPage() {
         setPaso(1);
     };
 
-    
-        // --- LOGICA PASO 3: CONFIRMAR ---
+    // --- LOGICA PASO 3: CONFIRMAR CON SWEETALERT ---
     const finalizarReserva = async () => {
         if(!seleccion) return;
         
-        // Validar campos del formulario
         if (!huesped.dni) {
-            alert("Por favor ingrese el DNI del huésped.");
+            Toast.fire({
+                icon: "warning",
+                title: "Por favor ingrese el DNI del huésped."
+            });
             return;
         }
 
         setLoading(true);
 
         try {
-            // 1. PRIMERO: Verificar si el huésped existe
-            // Ajusta la URL a tu controlador de Huéspedes
+            // 1. Verificar si el huésped existe
             const checkRes = await fetch(`http://localhost:8081/huespedes/getByDni?dni=${huesped.dni}`);
 
             if (checkRes.status === 404) {
-                // --- CASO: HUÉSPED NO EXISTE ---
-                const confirmar = confirm("El huésped no está registrado. ¿Desea ir a la pantalla de Alta de Huésped?");
-                if (confirmar) {
+                setLoading(false);
+                
+                // MODAL BONITO PARA PREGUNTAR
+                const resultado = await Swal.fire({
+                    title: 'Huésped no encontrado',
+                    text: `El DNI ${huesped.dni} no figura en el sistema. ¿Desea registrarlo ahora?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, registrar',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (resultado.isConfirmed) {
                     const estadoAGuardar = {
                         seleccion: seleccion,
                         dni: huesped.dni
                     };
                     localStorage.setItem("reservaPendiente", JSON.stringify(estadoAGuardar));
-                    // Redirigimos a la pantalla de creación de huésped
                     router.push("/dashboard/huesped/altaHuesped?returnTo=reserva"); 
                 }
-                setLoading(false);
-                return; // Cortamos la ejecución aquí
+                return; 
             }
 
             // --- CASO: HUÉSPED SÍ EXISTE ---
-            // Si llegamos acá, es porque el huésped existe. Procedemos a reservar.
-            
             const payload = {
                 reserva: {
                     cantHuesped: 1,
@@ -161,21 +210,18 @@ export default function CrearReservaPage() {
                     cantNoches: seleccion.cantNoches,
                     descuento: false,
                     estado: "Confirmada",
-                    idHuesped: parseInt(huesped.dni) // Vinculamos por ID
+                    idHuesped: parseInt(huesped.dni)
                 },
-                // Como el huésped YA EXISTE, mandamos solo el DNI en el objeto huesped
-                // El backend buscará el resto de datos en la BD.
                 huesped: {
                     dni: parseInt(huesped.dni),
-                    nombre: "",   // No hace falta enviarlo si ya existe
-                    apellido: "", // No hace falta enviarlo si ya existe
+                    nombre: "",   
+                    apellido: "", 
                     tipoDni: "DNI",
-                    // Enviamos dirección vacía o nula, el backend usará la de la BD
                     direccion: null 
                 },
                 habitacion: {
                     idHabitacion: seleccion.idHabitacion,
-                    idTipo: 1, // Este ID se ignorará en el backend gracias a la corrección anterior
+                    idTipo: 1, 
                     estado: "ocupada", 
                     nochesDescuento: 0
                 }
@@ -188,18 +234,33 @@ export default function CrearReservaPage() {
             });
 
             if(res.ok) {
-                alert("¡Éxito! La reserva ha sido registrada.");
-                // LIMPIAR MEMORIA AL FINALIZAR 
+                // EXITO: TOAST VERDE
+                Toast.fire({
+                    icon: "success",
+                    title: "¡Reserva registrada con éxito!"
+                });
+                
                 localStorage.removeItem("reservaPendiente");
-                router.push("/dashboard/reservas");
+                
+                setTimeout(() => {
+                    router.push("/dashboard/reservas");
+                }, 1500);
+
             } else {
                 const txt = await res.text();
-                alert("Error al registrar: " + txt);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error al registrar",
+                    text: txt
+                });
             }
 
         } catch (e) {
             console.error(e);
-            alert("Error de conexión con el servidor.");
+            Toast.fire({
+                icon: "error",
+                title: "Error de conexión con el servidor."
+            });
         } finally {
             setLoading(false);
         }
@@ -226,19 +287,47 @@ export default function CrearReservaPage() {
             <div className="bg-white shadow rounded-lg p-6 border">
                 <h2 className="text-xl font-bold mb-4">Buscar Disponibilidad</h2>
                 
-                <div className="flex gap-4 mb-6 items-end">
+                <div className="flex gap-4 mb-6 items-end flex-wrap">
                     <div>
                         <label className="block text-sm font-bold text-gray-700">Desde</label>
                         <input type="date" className="border p-2 rounded" value={fechaDesde} onChange={e => setFechaDesde(e.target.value)} />
                     </div>
-                    <div>
+                    <div className="relative">
                         <label className="block text-sm font-bold text-gray-700">Hasta</label>
-                        <input type="date" className="border p-2 rounded" value={fechaHasta} onChange={e => setFechaHasta(e.target.value)} />
+                        <input type="date" 
+                                className={`border p-2 rounded ${errorFechas ? 'border-red-500 bg-red-50' : ''}`} 
+                                value={fechaHasta} 
+                                onChange={e => setFechaHasta(e.target.value)} 
+                        />
+                        {errorFechas && (
+                            <p className="text-red-500 text-xs mt-1 absolute w-48">
+                                La fecha de fin debe ser mayor a la fecha de inicio
+                            </p>
+                        )}
                     </div>
-                    <button 
+                    
+                    <div className="min-w-[200px]">
+                        <label className="block text-sm font-bold text-gray-700">Tipo Habitación</label>
+                        <select className="border p-2 rounded w-full bg-white"
+                                value={tipoSeleccionado}
+                                onChange={(e) => setTipoSeleccionado(e.target.value)}>
+                            <option value="">Todas las habitaciones</option>
+                            {tiposHabitacion.map(tipo => (
+                                <option key={tipo.idTipo} value={tipo.idTipo}>
+                                    {tipo.nombreTipo}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <button
                         onClick={buscarDisponibilidad} 
-                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-bold"
-                        disabled={loading}
+                        className={`px-6 py-2 rounded font-bold text-white ${
+                            loading || errorFechas 
+                            ? 'bg-gray-400 cursor-not-allowed' 
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        }`}
+                        disabled={loading || !!errorFechas}
                     >
                         {loading ? "Cargando..." : "Buscar"}
                     </button>
@@ -305,7 +394,7 @@ export default function CrearReservaPage() {
                 <div className="bg-gray-50 p-4 rounded border mb-6">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="font-bold text-gray-600">Habitación:</div>
-                        <div>{seleccion.idHabitacion} (Tipo Estándar)</div>
+                        <div>{seleccion.idHabitacion}</div>
 
                         <div className="font-bold text-gray-600">Ingreso:</div>
                         <div>{seleccion.fechaInicio}, 12:00hs</div>

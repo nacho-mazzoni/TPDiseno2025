@@ -50,8 +50,6 @@ public class ReservaController {
     @PostMapping("/crear")
     public ResponseEntity<String> crearReserva(@RequestBody SolicitudReserva request) {
         try {
-            // El frontend envía un objeto grande con todo junto.
-            // Desglosamos para usar tu lógica actual.
             reservaService.crearReserva(request.getReserva(), request.getHuesped(), request.getHabitacion());
             return ResponseEntity.ok("Reserva creada con éxito");
         } catch (Exception e) {
@@ -63,14 +61,20 @@ public class ReservaController {
     @GetMapping("/disponibilidad")
     public ResponseEntity<List<CeldaCalendarioDTO>> obtenerDisponibilidad(
             @RequestParam("fechaInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String inicioStr,
-            @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String finStr) {
+            @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String finStr,
+            @RequestParam(value = "idTipo", required = false) Integer idTipo) {
 
         LocalDate inicio = LocalDate.parse(inicioStr);
         LocalDate fin = LocalDate.parse(finStr);
         
         List<CeldaCalendarioDTO> grilla = new ArrayList<>();
         List<HabitacionDTO> habitaciones = habitacionService.obtenerTodas().stream()
-                .map(h -> habitacionService.mapToDTOHabitacion(h)).toList();
+            .filter(h -> {
+                if (idTipo == null) return true;
+                return h.getIdTipo().getIdTipo().equals(idTipo); 
+            })
+            .map(h -> habitacionService.mapToDTOHabitacion(h))
+            .toList();
 
         // Obtenemos todas las reservas que impactan en este rango (Lógica que debe estar en Repo)
         List<DetalleReserva> ocupaciones = detalleReservaService.buscarReservasEnConflicto(inicio, fin); 
