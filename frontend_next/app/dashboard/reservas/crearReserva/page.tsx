@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Swal from 'sweetalert2'; 
 
-// --- TIPOS ---
+// TIPOS 
 interface CeldaCalendario {
   fecha: string;
   idHabitacion: number;
@@ -27,11 +27,11 @@ interface TipoHabitacion {
 export default function CrearReservaPage() {
     const router = useRouter();
     
-    // --- ESTADOS ---
+    // ESTADOS 
     const [paso, setPaso] = useState<1 | 2 | 3>(1);
     const [loading, setLoading] = useState(false);
 
-    // Paso 1: Búsqueda y Selección
+    //  Búsqueda y Selección
     const [fechaDesde, setFechaDesde] = useState("");
     const [fechaHasta, setFechaHasta] = useState("");
     const [disponibilidad, setDisponibilidad] = useState<CeldaCalendario[]>([]);
@@ -46,7 +46,7 @@ export default function CrearReservaPage() {
         cantNoches: number;
     } | null>(null);
 
-    // Paso 3: Datos Huésped
+    //  Datos Huésped
     const [huesped, setHuesped] = useState<HuespedForm>({
         dni: "",
         nombre: "",
@@ -55,9 +55,9 @@ export default function CrearReservaPage() {
     });
 
     // Validación visual de fechas
-    const errorFechas = fechaDesde && fechaHasta && fechaHasta < fechaDesde;
+    const errorFechas = fechaDesde && fechaHasta && fechaHasta <= fechaDesde;
 
-    // --- CONFIGURACIÓN SWEETALERT (TOAST) ---
+    // --- CONFIGURACIÓN SWEETALERT ---
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
@@ -98,7 +98,13 @@ export default function CrearReservaPage() {
         }
     }, []);
 
-    // --- LOGICA PASO 1: MOSTRAR ESTADO HABITACIONES ---
+    // --- CANCELAR  ---
+    const handleCancelarProceso = () => {
+        // Redirige al listado principal o al dashboard
+        router.push("/dashboard/reservas");
+    };
+
+    // ---  MOSTRAR ESTADO HABITACIONES ---
     const buscarDisponibilidad = async () => {
         if(!fechaDesde || !fechaHasta) {
             Toast.fire({
@@ -148,7 +154,7 @@ export default function CrearReservaPage() {
         });
     };
 
-    // --- LOGICA PASO 2: VERIFICACIÓN ---
+    // ---  VERIFICACIÓN ---
     const handleAceptarVerificacion = () => {
         setPaso(3);
     };
@@ -158,7 +164,7 @@ export default function CrearReservaPage() {
         setPaso(1);
     };
 
-    // --- LOGICA PASO 3: CONFIRMAR CON SWEETALERT ---
+    // --- CONFIRMAR CON SWEETALERT ---
     const finalizarReserva = async () => {
         if(!seleccion) return;
         
@@ -173,13 +179,13 @@ export default function CrearReservaPage() {
         setLoading(true);
 
         try {
-            // 1. Verificar si el huésped existe
+            // Verificar si el huésped existe
             const checkRes = await fetch(`http://localhost:8081/huespedes/getByDni?dni=${huesped.dni}`);
 
             if (checkRes.status === 404) {
                 setLoading(false);
                 
-                // MODAL BONITO PARA PREGUNTAR
+                // MODAL 
                 const resultado = await Swal.fire({
                     title: 'Huésped no encontrado',
                     text: `El DNI ${huesped.dni} no figura en el sistema. ¿Desea registrarlo ahora?`,
@@ -202,7 +208,7 @@ export default function CrearReservaPage() {
                 return; 
             }
 
-            // --- CASO: HUÉSPED SÍ EXISTE ---
+            // --- HUÉSPED SÍ EXISTE ---
             const payload = {
                 reserva: {
                     cantHuesped: 1,
@@ -273,7 +279,7 @@ export default function CrearReservaPage() {
     return (
         <div className="p-6 max-w-6xl mx-auto font-sans text-gray-800">
         
-        {/* HEADER PASOS */}
+        {/* HEADER */}
         <div className="mb-8 flex justify-between items-center bg-gray-100 p-4 rounded-lg">
             <div className={`font-bold ${paso === 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Selección</div>
             <div className="text-gray-400">→</div>
@@ -282,7 +288,7 @@ export default function CrearReservaPage() {
             <div className={`font-bold ${paso === 3 ? 'text-blue-600' : 'text-gray-400'}`}>3. Datos Huésped</div>
         </div>
 
-        {/* --- VISTA 1: GRILLA DE DISPONIBILIDAD --- */}
+        {/* --- GRILLA DE DISPONIBILIDAD --- */}
         {paso === 1 && (
             <div className="bg-white shadow rounded-lg p-6 border">
                 <h2 className="text-xl font-bold mb-4">Buscar Disponibilidad</h2>
@@ -376,17 +382,21 @@ export default function CrearReservaPage() {
                     </div>
                 )}
                 
-                {seleccion && (
-                    <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-between items-center border-t pt-4">
+                    {/* Botón cancelar siempre visible */}
+                    <button onClick={handleCancelarProceso} className="bg-gray-400 text-white px-6 py-2 rounded font-bold hover:bg-gray-500">
+                        Cancelar
+                    </button>
+
+                    {seleccion && (
                         <button onClick={() => setPaso(2)} className="bg-blue-600 text-white px-6 py-2 rounded font-bold">
                             Siguiente: Verificar
                         </button>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         )}
 
-        {/* --- VISTA 2: LISTADO DE VERIFICACIÓN --- */}
         {paso === 2 && seleccion && (
             <div className="bg-white shadow rounded-lg p-6 border max-w-3xl mx-auto">
                 <h2 className="text-xl font-bold mb-6 text-center">Verificar Reserva</h2>
@@ -407,10 +417,12 @@ export default function CrearReservaPage() {
                     </div>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
+                    {/* Rechazar vuelve al paso 1 */}
                     <button onClick={handleRechazarVerificacion} className="bg-gray-300 text-gray-800 px-6 py-2 rounded font-bold hover:bg-gray-400">
-                        Rechazar
+                        Rechazar (Volver)
                     </button>
+
                     <button onClick={handleAceptarVerificacion} className="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">
                         Aceptar
                     </button>
@@ -418,7 +430,6 @@ export default function CrearReservaPage() {
             </div>
         )}
 
-        {/* --- VISTA 3: DATOS DEL HUÉSPED --- */}
         {paso === 3 && (
             <div className="bg-white shadow rounded-lg p-6 border max-w-2xl mx-auto">
                 <h2 className="text-xl font-bold mb-6 text-center border-b pb-2">Reserva a nombre de:</h2>
@@ -465,10 +476,11 @@ export default function CrearReservaPage() {
                     </div>
                 </div>
 
-                <div className="flex justify-between mt-8 pt-4 border-t">
+                <div className="flex justify-between items-center mt-8 pt-4 border-t">
                     <button onClick={() => setPaso(2)} className="text-gray-500 font-bold hover:text-gray-700">
                         ← Volver
                     </button>
+
                     <button 
                         onClick={finalizarReserva} 
                         disabled={loading}

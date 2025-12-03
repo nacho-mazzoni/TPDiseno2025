@@ -60,9 +60,6 @@ export default function Sidebar() {
 
       {/* Parte Inferior: Usuario y Logout */}
       <div className="p-4 border-t border-gray-700">
-        <div className="mb-4 text-sm text-gray-400 text-center">
-          Hola, {usuario?.credeciales?.nombre || usuario?.credenciales?.nombre_usuario || 'Usuario'}
-        </div>
         <button
           onClick={handleLogout}
           className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"

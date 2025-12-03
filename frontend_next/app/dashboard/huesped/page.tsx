@@ -5,10 +5,6 @@ import { useRouter } from 'next/navigation';
 export default function HuespedMenuPage() {
   const router = useRouter();
 
-  const navegarA = (ruta: string) => {
-    console.log("Intentando navegar a:", ruta); // 👈 MIRA LA CONSOLA (F12)
-    router.push(ruta);
-  };
 
   return (
     <div className="p-10 max-w-5xl mx-auto">
@@ -16,9 +12,9 @@ export default function HuespedMenuPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* TARJETA 1: BUSCAR */}
+        {/* Buscar Huesped */}
         <div 
-          onClick={() => navegarA('/dashboard/huesped/buscarHuesped')}
+          onClick={() => router.push('/dashboard/huesped/buscarHuesped')}
           className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-500 transition duration-300 h-full flex flex-col items-center text-center cursor-pointer group"
         >
           <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 text-3xl group-hover:scale-110 transition">
@@ -28,9 +24,9 @@ export default function HuespedMenuPage() {
           <p className="text-gray-500 text-sm">Consulta el padrón y visualiza datos.</p>
         </div>
 
-        {/* TARJETA 2: NUEVO */}
+        {/*  dar De ALta */}
         <div 
-          onClick={() => navegarA('/dashboard/huesped/altaHuesped')}
+          onClick={() => router.push('/dashboard/huesped/altaHuesped')}
           className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-green-500 transition duration-300 h-full flex flex-col items-center text-center cursor-pointer group"
         >
           <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4 text-3xl group-hover:scale-110 transition">
@@ -40,15 +36,15 @@ export default function HuespedMenuPage() {
           <p className="text-gray-500 text-sm">Registra un nuevo cliente.</p>
         </div>
 
-        {/* TARJETA 3: ELIMINAR/EDITAR */}
+        {/* Modificar Huesped */}
         <div 
-          onClick={() => navegarA('/dashboard/huesped/buscarHuesped')}
+          onClick={() => router.push('/dashboard/huesped/buscarHuesped')}
           className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-red-500 transition duration-300 h-full flex flex-col items-center text-center cursor-pointer group"
         >
-          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4 text-3xl group-hover:scale-110 transition">
-            D
+          <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4 text-3xl group-hover:scale-110 transition">
+            M
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Eliminar / Editar</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Modificar Huesped</h2>
           <p className="text-gray-500 text-sm">Modifica o da de baja.</p>
         </div>
 

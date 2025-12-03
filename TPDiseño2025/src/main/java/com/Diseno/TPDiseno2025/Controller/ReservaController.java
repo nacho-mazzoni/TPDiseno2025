@@ -46,7 +46,7 @@ public class ReservaController {
         this.detalleReservaService = detalleReservaService;
     }
 
-    // ENDPOINT 1: CREAR RESERVA (Soporta el botón "Aceptar" del último mockup)
+    // CREAR RESERVA 
     @PostMapping("/crear")
     public ResponseEntity<String> crearReserva(@RequestBody SolicitudReserva request) {
         try {
@@ -57,55 +57,19 @@ public class ReservaController {
         }
     }
 
-    // ENDPOINT 2: DISPONIBILIDAD (Soporta la Grilla de Colores)
+    // DISPONIBILIDAD 
     @GetMapping("/disponibilidad")
     public ResponseEntity<List<CeldaCalendarioDTO>> obtenerDisponibilidad(
             @RequestParam("fechaInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String inicioStr,
             @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String finStr,
             @RequestParam(value = "idTipo", required = false) Integer idTipo) {
 
-        LocalDate inicio = LocalDate.parse(inicioStr);
-        LocalDate fin = LocalDate.parse(finStr);
-        
-        List<CeldaCalendarioDTO> grilla = new ArrayList<>();
-        List<HabitacionDTO> habitaciones = habitacionService.obtenerTodas().stream()
-            .filter(h -> {
-                if (idTipo == null) return true;
-                return h.getIdTipo().getIdTipo().equals(idTipo); 
-            })
-            .map(h -> habitacionService.mapToDTOHabitacion(h))
-            .toList();
-
-        // Obtenemos todas las reservas que impactan en este rango (Lógica que debe estar en Repo)
-        List<DetalleReserva> ocupaciones = detalleReservaService.buscarReservasEnConflicto(inicio, fin); 
-
-        // Generar la matriz Fecha x Habitacion
-        for (LocalDate date = inicio; !date.isAfter(fin); date = date.plusDays(1)) {
-            final LocalDate currentDate = date; // necesario para lambdas
-            
-            for (HabitacionDTO hab : habitaciones) {
-                CeldaCalendarioDTO celda = new CeldaCalendarioDTO();
-                celda.setFecha(currentDate.toString());
-                celda.setIdHabitacion(hab.getIdHabitacion());
-
-                // Lógica de cruce: ¿Está esta habitación ocupada en esta fecha?
-                boolean estaOcupada = ocupaciones.stream().anyMatch(d -> 
-                    d.getHabitacion().getIdHabitacion().equals(hab.getIdHabitacion()) &&
-                    !currentDate.isBefore(d.getReserva().getFechaInicio()) &&
-                    !currentDate.isAfter(d.getReserva().getFechaInicio().plusDays(d.getCantidadNoches()))
-                );
-
-                celda.setEstado(estaOcupada ? "OCUPADA" : "LIBRE");
-                grilla.add(celda);
-            }
-        }
-
-        return ResponseEntity.ok(grilla);
+        return ResponseEntity.ok( reservaService.obtenerMatrizDisponibilidad(inicioStr, finStr, idTipo));
     }
 
 }
 
-// Clase auxiliar para recibir el JSON completo del frontend
+// Clase auxiliar 
 @Data
 class SolicitudReserva {
     private ReservaDTO reserva;

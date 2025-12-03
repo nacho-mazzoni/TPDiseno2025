@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 // Definimos la estructura de datos del huésped
 interface Huesped {
@@ -10,7 +11,6 @@ interface Huesped {
   tipoDni: string;
   dni: number;
   email: string;
-  // Agrega más campos si tu backend los devuelve (ej: direccion, telefono)
 }
 
 export default function BuscarHuespedPage() {
@@ -54,17 +54,27 @@ export default function BuscarHuespedPage() {
       const response = await fetch(url);
 
       if (!response.ok) {
-        if (response.status === 404) throw new Error("No se encontraron huéspedes con esos datos.");
-        throw new Error("Error de conexión con el servidor.");
+        const resultado = await Swal.fire({
+            title: 'Huésped no encontrado',
+            text: `El DNI ${filtros.dni} no figura en el sistema. ¿Desea registrarlo ahora?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, registrar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (resultado.isConfirmed) router.push("/dashboard/huesped/altaHuesped");
+        return;
       }
 
       const data = await response.json();
       
-      // Convertimos a array siempre para evitar errores
       const lista = Array.isArray(data) ? data : [data];
       
       setResultados(lista);
-      setBusquedaRealizada(true); // ¡AQUÍ ACTIVAMOS LA TABLA!
+      setBusquedaRealizada(true); 
 
     } catch (err: any) {
       setError(err.message);
@@ -82,9 +92,8 @@ export default function BuscarHuespedPage() {
 
   const handleSiguiente = () => {
     if (seleccionado) {
-      // Aquí rediriges a donde necesites con el ID seleccionado
       console.log("Seleccionado DNI:", seleccionado);
-      // router.push(`/dashboard/huesped/editar/${seleccionado}`);
+      router.push(`/dashboard/huesped/modificarHuesped/${seleccionado}`);
     }
   };
 

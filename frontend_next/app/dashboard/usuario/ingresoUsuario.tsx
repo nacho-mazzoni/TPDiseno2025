@@ -76,7 +76,7 @@ export default function AuthComponent() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Campo NOMBRE (Ahora es obligatorio siempre) */}
+          {/* NOMBRE */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Nombre de Usuario
@@ -121,7 +121,7 @@ export default function AuthComponent() {
           <button
             onClick={() => {
                 setIsLogin(!isLogin);
-                setError(null); // Limpiamos el error al cambiar de modo
+                setError(null); 
             }}
             className="ml-1 font-medium text-blue-600 hover:underline"
           >
