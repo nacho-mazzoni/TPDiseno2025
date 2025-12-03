@@ -1,7 +1,5 @@
 package com.Diseno.TPDiseno2025.Controller;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Diseno.TPDiseno2025.Domain.DetalleReserva;
 import com.Diseno.TPDiseno2025.Model.CeldaCalendarioDTO;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
 import com.Diseno.TPDiseno2025.Model.HuespedDTO;
@@ -64,11 +61,9 @@ public class ReservaController {
             @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String finStr,
             @RequestParam(value = "idTipo", required = false) Integer idTipo) {
 
-        LocalDate inicio = LocalDate.parse(inicioStr);
-        LocalDate fin = LocalDate.parse(finStr);
-        
-        List<CeldaCalendarioDTO> grilla = new ArrayList<>();
-        List<HabitacionDTO> habitaciones = habitacionService.obtenerTodas().stream()
+
+
+     /*   List<HabitacionDTO> habitaciones = habitacionService.obtenerTodas().stream()
             .filter(h -> {
                 if (idTipo == null) return true;
                 return h.getIdTipo().getIdTipo().equals(idTipo); 
@@ -96,11 +91,11 @@ public class ReservaController {
                 );
 
                 celda.setEstado(estaOcupada ? "OCUPADA" : "LIBRE");
-                grilla.add(celda);
+                grilla.add(celda);  
             }
-        }
+        }*/
 
-        return ResponseEntity.ok(grilla);
+        return ResponseEntity.ok( reservaService.obtenerMatrizDisponibilidad(inicioStr, finStr, idTipo));
     }
 
 }

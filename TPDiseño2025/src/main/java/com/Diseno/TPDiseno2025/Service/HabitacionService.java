@@ -13,6 +13,7 @@ public interface HabitacionService {
     HabitacionDTO buscarHabitacionDTOByIdHabitacion(Integer idHabitacion);
     Habitacion mapToEntHabitacion(HabitacionDTO hDto);
     List<Habitacion> obtenerTodas();
+    List<Habitacion> obtenerTodasPorTipo(Integer idTipo);
     List<String> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta);
     Boolean verificarEstadoHabitacion(Integer idHabitacion); 
     void reservarHabitacion(Integer idHabitacion);

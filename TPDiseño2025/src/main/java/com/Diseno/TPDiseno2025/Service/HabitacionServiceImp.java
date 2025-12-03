@@ -58,6 +58,14 @@ public class HabitacionServiceImp implements HabitacionService{
     }
     
     @Override
+    public List<Habitacion> obtenerTodasPorTipo(Integer idTipo){
+        if(idTipo == null){
+            return this.obtenerTodas();
+        }
+        else return habitacionRepository.findByIdTipo(tipoHabitacionService.getTipoByIdTipo(idTipo));
+    }
+
+    @Override
     public List<String> mostrarestadoHabitacionesByFecha(String fechaDesde, String fechaHasta){
         List<String> estadosHabitaciones = new ArrayList<>();
         for (Habitacion h : this.obtenerTodas()) {
