@@ -11,9 +11,8 @@ export default function HuespedMenuPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Gestión de Huéspedes</h1>
-      <p className="text-gray-500 mb-8">Selecciona una operación para continuar.</p>
+    <div className="p-10 max-w-5xl mx-auto">
+      <h1 className="text-4xl font-bold text-blue-900 mb-10 text-center border-b pb-4">Gestión de Huéspedes</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
