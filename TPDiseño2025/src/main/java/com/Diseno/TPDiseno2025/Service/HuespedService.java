@@ -45,5 +45,7 @@ public interface HuespedService {
     Boolean existeHuesped(Huesped h);
 
     Huesped findById(Integer idHuesped);
+
+    void validarDatos(HuespedDTO hdto);
 }
 

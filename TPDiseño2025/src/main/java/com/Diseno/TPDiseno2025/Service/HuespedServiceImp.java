@@ -97,9 +97,81 @@ public class HuespedServiceImp implements HuespedService {
         return huespedes;
     }
 
+    private boolean soloLetras(String texto){
+            return texto.matches("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$");
+    }
+
+    private boolean soloNumeros(String texto){
+            return texto.matches("^[0-9]+$");
+    }
+
+    @Override
+    public void validarDatos(HuespedDTO dto){
+        if(dto == null){
+            throw new IllegalArgumentException("Los campos no han sido completados");
+        }
+        if(dto.getNombre()==null || dto.getNombre().isBlank()){
+            throw new IllegalArgumentException("El nombre no ha sido completado");
+        }
+        if(!soloLetras(dto.getNombre())){
+            throw new IllegalArgumentException("El nombre solo puede contener letras");
+        }
+        if(dto.getApellido()==null || dto.getApellido().isBlank()){
+            throw new IllegalArgumentException("El apellido no ha sido completado");
+        }
+        if(!soloLetras(dto.getNombre())){
+            throw new IllegalArgumentException("El apellido solo puede contener letras");
+        }
+        if(dto.getDni()==null || dto.getDni()<=0){
+            throw new IllegalArgumentException("El documento no ha sido completado o no es valido");
+        }
+        if(!soloLetras(dto.getPosIva()) && dto.getPosIva()!=null){
+            throw new IllegalArgumentException("La posicion solo puede contener letras");
+        }
+
+        DireccionDTO direccionDTO = dto.getDireccion();
+        
+        if(direccionDTO.getCalle()==null || direccionDTO.getCalle().isBlank()){
+            throw new IllegalArgumentException("La calle no ha sido completada");
+        }
+        if(!soloLetras(direccionDTO.getCalle())){
+            throw new IllegalArgumentException("La calle solo puede contener letras");
+        }
+        if(direccionDTO.getNumero()==null){
+            throw new IllegalArgumentException("El numero no ha sido completado");
+        }
+        if(direccionDTO.getNumero()<=0){
+            throw new IllegalArgumentException("El numero debe ser un numero positivo");
+        }
+        if(direccionDTO.getDepartamento()!=null && (!soloLetras(direccionDTO.getDepartamento()) || direccionDTO.getDepartamento().isBlank())){
+            throw new IllegalArgumentException("El departamento solo puede contener letras");
+        }
+        if(direccionDTO.getPiso()!=null && direccionDTO.getPiso()<0){
+            throw new IllegalArgumentException("El piso no es valido");
+        }
+        if(direccionDTO.getCodPostal()!=null && direccionDTO.getCodPostal()<=0){
+            throw new IllegalArgumentException("El codigo postal debe ser un numero positivo");
+        }
+        if(direccionDTO.getLocalidad()==null || direccionDTO.getLocalidad().isBlank()){
+            throw new IllegalArgumentException("La localidad no ha sido completada");
+        }
+        if(direccionDTO.getProvincia()==null || direccionDTO.getProvincia().isBlank()){
+            throw new IllegalArgumentException("La provincia no ha sido completada");
+        }
+        if(direccionDTO.getPais()==null || direccionDTO.getPais().isBlank()){
+            throw new IllegalArgumentException("El pais no ha sido completada");
+        }
+        if(dto.getOcupacion()==null || dto.getOcupacion().isBlank()){
+            throw new IllegalArgumentException("La ocupacion no ha sido completada");
+        }
+        if(!soloLetras(dto.getOcupacion())){
+            throw new IllegalArgumentException("La ocupacion solo debe tener letras");
+        }
+    }
+
     @Override
     public void DarDeAltaHuesped(HuespedDTO dto){
-
+        validarDatos(dto);
         if (huespedRepository.existsByDni(dto.getDni())) {
             throw new IllegalArgumentException("El huésped ya existe");
         }
