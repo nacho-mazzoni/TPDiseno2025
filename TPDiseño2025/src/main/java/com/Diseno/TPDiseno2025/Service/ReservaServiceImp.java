@@ -125,12 +125,12 @@ public class ReservaServiceImp implements ReservaService {
     }   
 
     @Override
-    public List<CeldaCalendarioDTO> obtenerMatrizDisponibilidad(String inicioStr, String finStr) {
+    public List<CeldaCalendarioDTO> obtenerMatrizDisponibilidad(String inicioStr, String finStr, Integer idTipo) {
         LocalDate fechaInicio = LocalDate.parse(inicioStr);
         LocalDate fechaFin = LocalDate.parse(finStr);
 
         // 1. Traer todo lo necesario
-        List<Habitacion> todasLasHabitaciones = habitacionService.obtenerTodas();
+        List<Habitacion> todasLasHabitaciones = habitacionService.obtenerTodasPorTipo(idTipo);
         List<DetalleReserva> ocupaciones = detalleService.buscarReservasEnConflicto(fechaInicio, fechaFin);
         
         List<CeldaCalendarioDTO> grilla = new ArrayList<>();
