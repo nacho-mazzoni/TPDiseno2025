@@ -38,21 +38,19 @@ public class ReservaServiceImp implements ReservaService {
     @Override   
     public void crearReserva(ReservaDTO r, HuespedDTO h, HabitacionDTO habitacion) {
         
-        // 1. Buscamos al huésped. 
-        // Como tu HuespedService lanza 'NotFoundException' si no lo encuentra, 
-        // esto cortará el flujo automáticamente con un error 404 si el DNI no existe.
+        //Buscamos al huesped
         Huesped huespedExistente = huespedService.buscarHuespedByTipoDniAndDni(h.getTipoDni(), h.getDni());
 
-        // 2. Mapeamos la reserva
+        //Mapear la reserva
         Reserva nuevaReserva = this.mapToEntity(r);
         
-        // 3. Asignamos el huésped REAL que trajimos de la BD
+        //Asigno le huesped
         nuevaReserva.setHuesped(huespedExistente);
 
-        // 4. Guardamos la Reserva
+        //Guarda la Reserva
         reservaRepository.save(nuevaReserva);
 
-        // 5. Guardamos el Detalle
+        //Guarda el DetalleReserva
         DetalleReserva detalle = new DetalleReserva();
         detalle.setReserva(nuevaReserva);
     
@@ -122,54 +120,50 @@ public class ReservaServiceImp implements ReservaService {
         return reserva;
     }   
 
+    @Override
     public List<CeldaCalendarioDTO> obtenerMatrizDisponibilidad(String inicioStr, String finStr) {
-    LocalDate fechaInicio = LocalDate.parse(inicioStr);
-    LocalDate fechaFin = LocalDate.parse(finStr);
+        LocalDate fechaInicio = LocalDate.parse(inicioStr);
+        LocalDate fechaFin = LocalDate.parse(finStr);
 
-    // 1. Obtener TODAS las habitaciones (para saber cuáles pintar de verde/libre)
-    List<Habitacion> todasLasHabitaciones = habitacionService.obtenerTodas();
-
-    // 2. Obtener solo las reservas que ocupan lugar en esas fechas
-    List<DetalleReserva> ocupaciones = detalleService.buscarReservasEnConflicto(fechaInicio, fechaFin);
-
-    // 3. Crear la grilla de respuesta
-    List<CeldaCalendarioDTO> grilla = new ArrayList<>();
-
-    // Iteramos día por día dentro del rango solicitado
-    for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
+        // 1. Traer todo lo necesario
+        List<Habitacion> todasLasHabitaciones = habitacionService.obtenerTodas();
+        List<DetalleReserva> ocupaciones = detalleService.buscarReservasEnConflicto(fechaInicio, fechaFin);
         
-        final LocalDate fechaActual = fecha; // Variable final para usar en lambda
+        List<CeldaCalendarioDTO> grilla = new ArrayList<>();
 
-        for (Habitacion habitacion : todasLasHabitaciones) {
+        // 2. Recorrer día por día
+        for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
             
-            String estado = "LIBRE"; // Por defecto está libre (Verde)
+            final LocalDate fechaActual = fecha; 
 
-            // Verificamos si esta habitación está en la lista de ocupadas PARA ESTE DÍA ESPECÍFICO
-            // Usamos 'stream' para filtrar la lista de 'ocupaciones' que trajimos de la BD
-            boolean estaOcupada = ocupaciones.stream().anyMatch(detalle -> {
-                // A. ¿Es la misma habitación?
-                boolean mismaHabitacion = detalle.getHabitacion().getIdHabitacion().equals(habitacion.getIdHabitacion());
+            for (Habitacion habitacion : todasLasHabitaciones) {
                 
-                // B. ¿La fecha actual cae dentro del rango de esa reserva?
-                LocalDate inicioReserva = detalle.getReserva().getFechaInicio();
-                LocalDate finReserva = inicioReserva.plusDays(detalle.getCantidadNoches());
-                
-                // La fecha actual debe ser >= inicio Y < fin (asumiendo que el día de salida queda libre)
-                boolean fechaCaeEnReserva = !fechaActual.isBefore(inicioReserva) && fechaActual.isBefore(finReserva);
+                String estadoCelda = "LIBRE"; // Verde por defecto
 
-                return mismaHabitacion && fechaCaeEnReserva;
-            });
+                // Buscamos si hay alguna reserva que ocupe esta habitación en esta fecha
+                DetalleReserva detalle = ocupaciones.stream()
+                .filter(d -> 
+                    d.getHabitacion().getIdHabitacion().equals(habitacion.getIdHabitacion()) &&
+                    !fechaActual.isBefore(d.getReserva().getFechaInicio()) &&
+                    fechaActual.isBefore(d.getReserva().getFechaInicio().plusDays(d.getCantidadNoches()))
+                )
+                .findFirst()
+                .orElse(null);
 
-            if (estaOcupada) {
-                estado = "OCUPADA"; // Rojo
-                // Opcional: Podrías chequear detalle.getReserva().getEstado() para diferenciar entre RESERVADA y OCUPADA
+                if (detalle != null) {
+                    String estadoRealBD = detalle.getReserva().getEstado();
+
+                    if (estadoRealBD != null && estadoRealBD.trim().equalsIgnoreCase("Confirmada")) {
+                        estadoCelda = "RESERVADA"; // Amarillo
+                    } else {
+                        estadoCelda = "OCUPADA"; // Rojo
+                    }
+                }
+                grilla.add(new CeldaCalendarioDTO(fechaActual.toString(), habitacion.getIdHabitacion(), estadoCelda));
             }
-
-            grilla.add(new CeldaCalendarioDTO(fechaActual.toString(), habitacion.getIdHabitacion(), estado));
         }
+        return grilla;
     }
-
-    return grilla;
-}
+    
 
 }

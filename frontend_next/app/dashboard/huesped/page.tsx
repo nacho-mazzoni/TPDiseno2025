@@ -12,7 +12,7 @@ export default function HuespedMenuPage() {
 
   return (
     <div className="p-10 max-w-5xl mx-auto">
-      <h1 className="text-4xl font-bold text-blue-900 mb-10 text-center border-b pb-4">Gestión de Huéspedes</h1>
+      <h1 className="text-4xl font-bold text-blue-900 mb-10 text-center border-b pb-4">Administración de Huéspedes</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         

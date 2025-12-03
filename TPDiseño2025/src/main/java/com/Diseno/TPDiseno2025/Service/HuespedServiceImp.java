@@ -162,10 +162,10 @@ public class HuespedServiceImp implements HuespedService {
             throw new IllegalArgumentException("El pais no ha sido completada");
         }
         if(dto.getOcupacion()==null || dto.getOcupacion().isBlank()){
-            throw new IllegalArgumentException("La ocupacion no ha sido completada")
+            throw new IllegalArgumentException("La ocupacion no ha sido completada");
         }
         if(!soloLetras(dto.getOcupacion())){
-            throw new IllegalArgumentException("La ocupacion solo debe tener letras")
+            throw new IllegalArgumentException("La ocupacion solo debe tener letras");
         }
     }
 

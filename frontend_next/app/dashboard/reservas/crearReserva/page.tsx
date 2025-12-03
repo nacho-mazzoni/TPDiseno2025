@@ -55,7 +55,7 @@ export default function CrearReservaPage() {
     });
 
     // Validación visual de fechas
-    const errorFechas = fechaDesde && fechaHasta && fechaHasta <= fechaDesde;
+    const errorFechas = fechaDesde && fechaHasta && fechaHasta < fechaDesde;
 
     // --- CONFIGURACIÓN SWEETALERT (TOAST) ---
     const Toast = Swal.mixin({
@@ -222,7 +222,7 @@ export default function CrearReservaPage() {
                 habitacion: {
                     idHabitacion: seleccion.idHabitacion,
                     idTipo: 1, 
-                    estado: "ocupada", 
+                    estado: "Reservada", 
                     nochesDescuento: 0
                 }
             };
