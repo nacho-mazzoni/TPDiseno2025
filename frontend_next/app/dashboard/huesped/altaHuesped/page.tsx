@@ -120,8 +120,8 @@ export default function AltaHuespedPage() {
         direccion: {
             calle: form.calle,
             numero: parseInt(form.numero) || 0,
-            departamento: form.departamento,
-            piso: form.piso,
+            departamento: form.departamento || null,
+            piso: form.piso || null,
             codPostal: parseInt(form.codPostal) || 0,
             // Campos geográficos obligatorios
             localidad: form.localidad, 
