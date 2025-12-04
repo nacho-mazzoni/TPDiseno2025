@@ -111,13 +111,13 @@ public class HuespedServiceImp implements HuespedService {
         if(dto.getNombre()==null || dto.getNombre().isBlank()){
             throw new IllegalArgumentException("El nombre no ha sido completado");
         }
-        if(!soloLetras(dto.getNombre())){
+        if(dto.getNombre()!=null && !soloLetras(dto.getNombre())){
             throw new IllegalArgumentException("El nombre solo puede contener letras");
         }
         if(dto.getApellido()==null || dto.getApellido().isBlank()){
             throw new IllegalArgumentException("El apellido no ha sido completado");
         }
-        if(!soloLetras(dto.getNombre())){
+        if(dto.getApellido()!=null && !soloLetras(dto.getApellido())){
             throw new IllegalArgumentException("El apellido solo puede contener letras");
         }
         if(dto.getDni()==null || dto.getDni()<=0){
@@ -126,19 +126,19 @@ public class HuespedServiceImp implements HuespedService {
         if(!soloLetras(dto.getPosIva()) && dto.getPosIva()!=null){
             throw new IllegalArgumentException("La posicion solo puede contener letras");
         }
-
+        
         DireccionDTO direccionDTO = dto.getDireccion();
         
         if(direccionDTO.getCalle()==null || direccionDTO.getCalle().isBlank()){
             throw new IllegalArgumentException("La calle no ha sido completada");
         }
-        if(!soloLetras(direccionDTO.getCalle())){
+        if(direccionDTO.getCalle()!=null && !soloLetras(direccionDTO.getCalle())){
             throw new IllegalArgumentException("La calle solo puede contener letras");
         }
         if(direccionDTO.getNumero()==null){
             throw new IllegalArgumentException("El numero no ha sido completado");
         }
-        if(direccionDTO.getNumero()<=0){
+        if(direccionDTO.getNumero()!=null && direccionDTO.getNumero()<=0){
             throw new IllegalArgumentException("El numero debe ser un numero positivo");
         }
         if(direccionDTO.getDepartamento()!=null && (!soloLetras(direccionDTO.getDepartamento()) || direccionDTO.getDepartamento().isBlank())){
@@ -147,11 +147,17 @@ public class HuespedServiceImp implements HuespedService {
         if(direccionDTO.getPiso()!=null && direccionDTO.getPiso()<0){
             throw new IllegalArgumentException("El piso no es valido");
         }
+        if(direccionDTO.getCodPostal()==null){
+            throw new IllegalArgumentException("El codigo postal no ha sido completado");
+        }
         if(direccionDTO.getCodPostal()!=null && direccionDTO.getCodPostal()<=0){
             throw new IllegalArgumentException("El codigo postal debe ser un numero positivo");
         }
         if(direccionDTO.getLocalidad()==null || direccionDTO.getLocalidad().isBlank()){
             throw new IllegalArgumentException("La localidad no ha sido completada");
+        }
+        if(direccionDTO.getLocalidad()!=null && !soloLetras(direccionDTO.getLocalidad())){
+            throw new IllegalArgumentException("La localidad solo puede contener letras");
         }
         if(direccionDTO.getProvincia()==null || direccionDTO.getProvincia().isBlank()){
             throw new IllegalArgumentException("La provincia no ha sido completada");
@@ -159,11 +165,14 @@ public class HuespedServiceImp implements HuespedService {
         if(direccionDTO.getPais()==null || direccionDTO.getPais().isBlank()){
             throw new IllegalArgumentException("El pais no ha sido completada");
         }
-        if(dto.getOcupacion()==null || dto.getOcupacion().isBlank()){
-            throw new IllegalArgumentException("La ocupacion no ha sido completada")
+        if(direccionDTO.getPais()!=null && !soloLetras(direccionDTO.getPais())){
+            throw new IllegalArgumentException("El pais solo debe tener letras");
         }
-        if(!soloLetras(dto.getOcupacion())){
-            throw new IllegalArgumentException("La ocupacion solo debe tener letras")
+        if(dto.getOcupacion()==null || dto.getOcupacion().isBlank()){
+            throw new IllegalArgumentException("La ocupacion no ha sido completada");
+        }
+        if(dto.getOcupacion()!=null && !soloLetras(dto.getOcupacion())){
+            throw new IllegalArgumentException("La ocupacion solo debe tener letras");
         }
     }
 
