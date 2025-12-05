@@ -15,7 +15,6 @@ interface HuespedForm {
   posIva: string;
   telefono: string;
   email: string;
-  nacionalidad: string;
   ocupacion: string;
   calle: string;
   numero: string;
@@ -36,7 +35,7 @@ export default function AltaHuespedPage() {
   const [form, setForm] = useState<HuespedForm>({
     apellido: "", nombre: "", tipoDni: "DNI", dni: "", cuil: "",
     fechaNacimiento: "", posIva: "Consumidor Final", telefono: "",
-    email: "", nacionalidad: "", ocupacion: "",
+    email: "", ocupacion: "",
     calle: "", numero: "", departamento: "", piso: "",
     codPostal: "", localidad: "", provincia: "", pais: ""
   });
@@ -52,7 +51,7 @@ export default function AltaHuespedPage() {
     const { name, value } = e.target;
     
     // 1. Validaciones al escribir (bloqueo de teclas)
-    const camposSoloTexto = ["nombre", "apellido", "nacionalidad", "ocupacion", "pais", "provincia", "localidad"];
+    const camposSoloTexto = ["nombre", "apellido", "ocupacion", "pais", "provincia", "localidad"];
     // Sacamos "telefono" de aquí porque tiene reglas especiales
     const camposSoloNum = ["dni", "cuil", "codPostal", "numero", "piso"]; 
 
@@ -115,7 +114,6 @@ export default function AltaHuespedPage() {
     if (!form.cuil) registrarError("cuil", "El CUIL es obligatorio.");
     if (!form.fechaNacimiento) registrarError("fechaNacimiento", "La fecha de nacimiento es obligatoria.");
     if (!form.telefono) registrarError("telefono", "El teléfono es obligatorio.");
-    if (!form.nacionalidad) registrarError("nacionalidad", "La nacionalidad es obligatoria.");
     if (!form.ocupacion) registrarError("ocupacion", "La ocupación es obligatoria.");
 
     // 2. DIRECCIÓN
@@ -267,7 +265,7 @@ export default function AltaHuespedPage() {
           setForm({
             apellido: "", nombre: "", tipoDni: "DNI", dni: "", cuil: "",
             fechaNacimiento: "", posIva: "Consumidor Final", telefono: "",
-            email: "", nacionalidad: "", ocupacion: "",
+            email: "", ocupacion: "",
             calle: "", numero: "", departamento: "", piso: "",
             codPostal: "", localidad: "", provincia: "", pais: ""
           });
@@ -355,11 +353,6 @@ export default function AltaHuespedPage() {
             <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Email:</label>
                 <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="ejemplo@mail.com" className="w-full border p-2 rounded" />
-            </div>
-
-            <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Nacionalidad: <span className="text-red-500">(*)</span></label>
-                <input name="nacionalidad" value={form.nacionalidad} onChange={handleChange} className={getInputClass("nacionalidad")} placeholder="Ej: Argentino" />
             </div>
         </div>
 
