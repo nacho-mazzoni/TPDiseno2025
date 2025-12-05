@@ -134,12 +134,22 @@ export default function AltaHuespedPage() {
         registrarError("cuil", "El CUIL debe tener exactamente 11 dígitos.");
     }
 
-    // Validación de Teléfono: Contamos solo los números para el límite de 15
+    // Validación de Teléfono
     if (form.telefono) {
-        const soloNumerosTel = form.telefono.replace(/[^0-9]/g, ""); // Quitamos espacios y signos
-        if (soloNumerosTel.length > 15) {
+        
+        const soloNumerosTel = form.telefono.replace(/[^0-9]/g, "");
+        
+        //Mínimo 10 dígitos reales
+        if (soloNumerosTel.length < 10) {
+            registrarError("telefono", "El teléfono debe tener al menos 10 números.");
+        }
+        //Máximo 15 dígitos reales
+        else if (soloNumerosTel.length > 15) {
             registrarError("telefono", "El teléfono no puede tener más de 15 números.");
         }
+    } else {
+        // Si está vacío 
+        registrarError("telefono", "El teléfono es obligatorio.");
     }
 
     if (form.fechaNacimiento) {

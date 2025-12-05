@@ -176,8 +176,20 @@ export default function ModificarHuespedPage({ params }: { params: Promise<{ dni
         registrarError("cuil", "El CUIL debe tener exactamente 11 dígitos.");
     }
     if (form.telefono) {
+        
         const soloNumerosTel = form.telefono.replace(/[^0-9]/g, "");
-        if (soloNumerosTel.length > 15) registrarError("telefono", "El teléfono no puede tener más de 15 números.");
+        
+        //Mínimo 10 dígitos reales
+        if (soloNumerosTel.length < 10) {
+            registrarError("telefono", "El teléfono debe tener al menos 10 números.");
+        }
+        //Máximo 15 dígitos reales
+        else if (soloNumerosTel.length > 15) {
+            registrarError("telefono", "El teléfono no puede tener más de 15 números.");
+        }
+    } else {
+        // Si está vacío 
+        registrarError("telefono", "El teléfono es obligatorio.");
     }
     if (form.fechaNacimiento) {
         const edad = calcularEdad(form.fechaNacimiento);
