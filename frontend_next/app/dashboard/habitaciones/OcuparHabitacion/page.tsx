@@ -318,7 +318,7 @@ export default function OcuparHabitacionPage() {
                                 onChange={e => setFechaHasta(e.target.value)} 
                             />
                             {errorFechas && (
-                                <p className="text-red-500 text-xs mt-1 absolute w-48">
+                                <p className="text-red-500 text-xs mt-1 absolute w-70">
                                     La fecha de fin debe ser mayor a la fecha de inicio
                                 </p>
                             )}  
@@ -507,13 +507,8 @@ export default function OcuparHabitacionPage() {
                                     />
                                 </div>
                             </div>
-                            
-                            {/* Campos Dirección/Provincia decorativos (no hay endpoint aún) */}
+     
                             <div>
-                                <label className="block text-sm font-bold text-gray-600 mb-1">Provincia</label>
-                                <select className="border p-2 rounded w-full bg-gray-100 cursor-not-allowed" disabled>
-                                    <option>Santa Fe</option>
-                                </select>
                             </div>
 
                             <button 

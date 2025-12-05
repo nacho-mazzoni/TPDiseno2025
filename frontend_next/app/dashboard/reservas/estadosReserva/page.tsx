@@ -37,7 +37,7 @@ export default function EstadosPage() {
 
  
     // Validación visual de fechas
-    const errorFechas = fechaDesde && fechaHasta && fechaHasta <= fechaDesde;
+    const errorFechas = fechaDesde && fechaHasta && fechaHasta < fechaDesde;
 
     // --- CONFIGURACIÓN SWEETALERT (TOAST) ---
     const Toast = Swal.mixin({
@@ -132,7 +132,7 @@ export default function EstadosPage() {
                                 onChange={e => setFechaHasta(e.target.value)} 
                         />
                         {errorFechas && (
-                            <p className="text-red-500 text-xs mt-1 absolute w-48">
+                            <p className="text-red-500 text-xs mt-1 absolute w-78">
                                 La fecha de fin debe ser mayor a la fecha de inicio
                             </p>
                         )}
