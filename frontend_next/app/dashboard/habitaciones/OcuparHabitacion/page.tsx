@@ -69,8 +69,8 @@ export default function OcuparHabitacionPage() {
         timerProgressBar: true
     });
 
-        const seleccionarCelda = (celda: CeldaCalendario) => {
-        if (celda.estado !== "LIBRE") {
+        const seleccionarCelda = (celda: CeldaCalendario, rowHasBlockedCells: boolean) => {
+        if (celda.estado !== "LIBRE" || rowHasBlockedCells) {
             Toast.fire({
                 icon: "error",
                 title: "La habitación seleccionada no está disponible."
@@ -354,30 +354,40 @@ export default function OcuparHabitacionPage() {
                                 </tr>
                             </thead>
                              <tbody>
-                                    {getHabitaciones().map(idHab => (
-                                        <tr key={idHab}>
-                                            <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
-                                            {getDias().map(dia => {
-                                                const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
-                                                const estado = celda ? celda.estado : "DESCONOCIDO";
-                                                
-                                                let color = "bg-green-200 hover:bg-green-300 cursor-pointer";
-                                                if (estado === "OCUPADA") color = "bg-red-300 cursor-not-allowed";
-                                                if (estado === "RESERVADA") color = "bg-yellow-200 hover:bg-yellow-300 cursor-pointer";
+                                    {getHabitaciones().map(idHab => {
+                                        // Verificar si la fila tiene celdas ocupadas o reservadas
+                                        const rowHasBlockedCells = getDias().some(dia => {
+                                            const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
+                                            const estado = celda ? celda.estado : "DESCONOCIDO";
+                                            return estado === "OCUPADA" || estado === "RESERVADA";
+                                        });
 
-                                                const isSelected = seleccion?.idHabitacion === idHab;
+                                        return (
+                                            <tr key={idHab}>
+                                                <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
+                                                {getDias().map(dia => {
+                                                    const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
+                                                    const estado = celda ? celda.estado : "DESCONOCIDO";
+                                                    
+                                                    let color = "bg-green-200 hover:bg-green-300 cursor-pointer";
+                                                    if(rowHasBlockedCells && estado === "LIBRE") color = "bg-green-200 cursor-not-allowed";
+                                                    if (estado === "OCUPADA") color = "bg-red-300 cursor-not-allowed";
+                                                    if (estado === "RESERVADA") color = "bg-yellow-200 cursor-not-allowed";
 
-                                                return (
-                                                    <td 
-                                                    key={dia} 
-                                                    className={`p-3 border ${color} ${color} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
-                                                    title={estado}
-                                                    onClick={() => celda && seleccionarCelda(celda)}
-                                                />
-                                            )
-                                            })}
-                                        </tr>
-                                    ))}
+                                                    const isSelected = seleccion?.idHabitacion === idHab;
+
+                                                    return (
+                                                        <td 
+                                                        key={dia} 
+                                                        className={`p-3 border ${color} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
+                                                        title={estado}
+                                                        onClick={() => celda && seleccionarCelda(celda, rowHasBlockedCells)}
+                                                    />
+                                                )
+                                                })}
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>
