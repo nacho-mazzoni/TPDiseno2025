@@ -280,7 +280,7 @@ export default function CrearReservaPage() {
         <div className="p-3 max-w-6xl mx-auto font-sans text-gray-800">
         
         {/* HEADER */}
-        <div className="mb-8 flex justify-center items-center bg-gray-100 p-0.5 rounded-lg space-x-50">
+        <div className="mb-8 flex justify-between items-center bg-gray-100 p-0.5 rounded-lg">
             <div className={`font-bold ${paso === 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Selección</div>
             <div className="text-gray-400">→</div>
             <div className={`font-bold ${paso === 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Verificación</div>
