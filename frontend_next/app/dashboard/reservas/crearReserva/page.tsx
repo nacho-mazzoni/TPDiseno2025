@@ -358,17 +358,16 @@ export default function CrearReservaPage() {
                                             const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
                                             const estado = celda ? celda.estado : "DESCONOCIDO";
                                             
-                                            let bgClass = "bg-green-200"; 
-                                            let cursorClass = "cursor-pointer";
-                                            if(estado === "OCUPADA") { bgClass = "bg-red-300"; cursorClass = "cursor-not-allowed"; }
-                                            if(estado === "RESERVADA") { bgClass = "bg-yellow-200"; cursorClass = "cursor-not-allowed"; }
+                                            let bgClass = "bg-green-200 hover:bg-green-300 cursor-pointer";
+                                            if (estado === "OCUPADA") bgClass = "bg-red-300 cursor-not-allowed";
+                                            if (estado === "RESERVADA") bgClass = "bg-yellow-200 hover:bg-yellow-300 cursor-pointer";
                                             
                                             const isSelected = seleccion?.idHabitacion === idHab;
 
                                             return (
                                                 <td 
                                                     key={dia} 
-                                                    className={`p-3 border ${bgClass} ${cursorClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
+                                                    className={`p-3 border ${bgClass} ${bgClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
                                                     title={estado}
                                                     onClick={() => celda && seleccionarCelda(celda)}
                                                 />
@@ -426,8 +425,8 @@ export default function CrearReservaPage() {
 
                     {/* Botón Siguiente: Verificar */}
                     {seleccion && (
-                        <button onClick={() => setPaso(2)} className="bg-blue-600 text-white px-6 py-2 rounded font-bold">
-                            Siguiente: Verificar
+                        <button onClick={() => setPaso(2)} className="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700 transition-colors">
+                            Siguiente: Verificación
                         </button>
                     )}
                 </div>
