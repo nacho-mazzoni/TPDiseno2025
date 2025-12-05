@@ -41,6 +41,15 @@ public class ReservaServiceImp implements ReservaService {
 
     @Override   
     public void crearReserva(ReservaDTO r, HuespedDTO h, HabitacionDTO habitacion) {
+        LocalDate fechaDesde = LocalDate.parse(r.getFechaInicio());
+        LocalDate fechaHasta = fechaDesde.plusDays(r.getCantNoches());
+        //Verificar disponibilidad de la habitacion
+
+        boolean disponible = habitacionService.habitacionDisponibleEnFechas(habitacion.getIdHabitacion(), fechaDesde, fechaHasta);
+        
+        if(!disponible){
+            throw new IllegalArgumentException("La habitacion no esta disponible en las fechas seleccionadas.");
+        }
         
         //Buscamos al huesped
         Huesped huespedExistente = huespedService.buscarHuespedByTipoDniAndDni(h.getTipoDni(), h.getDni());

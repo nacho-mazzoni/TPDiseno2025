@@ -1,11 +1,13 @@
 package com.Diseno.TPDiseno2025.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.Diseno.TPDiseno2025.Domain.DetalleReserva;
 import com.Diseno.TPDiseno2025.Domain.Habitacion;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
 import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
@@ -13,6 +15,9 @@ import com.Diseno.TPDiseno2025.Repository.HabitacionRepository;
 
 @Service
 public class HabitacionServiceImp implements HabitacionService{
+
+    @Autowired
+    private DetalleReservaService detalleReservaService;
 
     @Autowired
     private HabitacionRepository habitacionRepository;
@@ -100,5 +105,17 @@ public class HabitacionServiceImp implements HabitacionService{
     @Override 
     public HabitacionDTO buscarHabitacionDTOByIdHabitacion(Integer idHabitacion){
         return this.mapToDTOHabitacion(habitacionRepository.findById(idHabitacion).get());
+    }
+
+    @Override
+    public boolean habitacionDisponibleEnFechas(Integer idHabitacion, LocalDate fechaDesde, LocalDate fechaHasta){
+        boolean disponible = true;
+        List<DetalleReserva> reservasEnConflicto = detalleReservaService.buscarReservasEnConflicto(fechaDesde, fechaHasta);
+        for(DetalleReserva dr : reservasEnConflicto){
+            if(dr.getHabitacion().getIdHabitacion().equals(idHabitacion)){
+                disponible = false;
+            }
+        }
+        return disponible;
     }
 }

@@ -69,6 +69,23 @@ export default function OcuparHabitacionPage() {
         timerProgressBar: true
     });
 
+        const seleccionarCelda = (celda: CeldaCalendario) => {
+        if (celda.estado !== "LIBRE") {
+            Toast.fire({
+                icon: "error",
+                title: "La habitación seleccionada no está disponible."
+            });
+            return;
+        }
+
+        setSeleccion({
+            idHabitacion: celda.idHabitacion,
+            fechaInicio: fechaDesde,
+            fechaFin: fechaHasta,
+            idReservaPrevia: null
+        });
+    };
+
     // Validación visual de fechas
     const errorFechas = fechaDesde && fechaHasta && fechaHasta < fechaDesde;
 
@@ -277,13 +294,17 @@ export default function OcuparHabitacionPage() {
 
     return (
         <div className="p-6 max-w-6xl mx-auto font-sans text-gray-800">
-            <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">Gestión de Estadía - Ocupar Habitación</h1>
+            
+                {/* HEADER */}
+            <div className="mb-8 flex justify-center items-center bg-gray-100 p-0.5 rounded-lg space-x-50">
+                <div className={`font-bold ${paso === 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Selección</div>
+                <div className="text-gray-400">→</div>
+                <div className={`font-bold ${paso === 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Verificación</div>
+            </div>
 
             {/* PASO 1: SELECCIÓN DE HABITACIÓN */}
             {paso === 1 && (
-                <div className="bg-white shadow p-6 rounded border">
-                    <h2 className="text-lg font-bold mb-4 border-b pb-2">1. Seleccionar Habitación</h2>
-                    
+                <div className="bg-white shadow p-6 rounded border">                   
                     <div className="flex gap-4 mb-4 items-end flex-wrap">
                         <div>
                             <label className="block text-sm font-bold text-gray-600">Desde</label>
@@ -322,18 +343,20 @@ export default function OcuparHabitacionPage() {
                     </div>
 
                     {disponibilidad.length > 0 && (
-                        <div className="overflow-auto border rounded max-h-[500px]">
-                            <table className="w-full text-center border-collapse">
-                                <thead className="bg-gray-200 sticky top-0 z-10">
-                                    <tr>
-                                        <th className="p-3 border">Habitación</th>
-                                        {getDias().map(d => <th key={d} className="p-3 border min-w-[100px]">{d}</th>)}
-                                    </tr>
-                                </thead>
-                                <tbody>
+                        <div id="taula" className="relative border rounded overflow-auto max-h-[60vh]">
+                        <table className="min-w-full text-center border-collapse">
+                            <thead className="bg-gray-200 sticky top-0 z-30">
+                                <tr>
+                                    <th className="p-3 border sticky left-0 top-0 z-40 bg-gray-200 whitespace-nowrap">Habitación</th>
+                                    {getDias().map(dia => (
+                                        <th key={dia} className="p-3 border min-w-[100px] whitespace-nowrap">{dia}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                             <tbody>
                                     {getHabitaciones().map(idHab => (
                                         <tr key={idHab}>
-                                            <td className="p-3 border font-bold bg-gray-50">Hab {idHab}</td>
+                                            <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
                                             {getDias().map(dia => {
                                                 const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
                                                 const estado = celda ? celda.estado : "DESCONOCIDO";
@@ -342,11 +365,16 @@ export default function OcuparHabitacionPage() {
                                                 if (estado === "OCUPADA") color = "bg-red-300 cursor-not-allowed";
                                                 if (estado === "RESERVADA") color = "bg-yellow-200 hover:bg-yellow-300 cursor-pointer";
 
+                                                const isSelected = seleccion?.idHabitacion === idHab;
+
                                                 return (
-                                                    <td key={dia} className={`p-3 border ${color}`} onClick={() => celda && handleCellClick(celda)}>
-                                                        {estado}
-                                                    </td>
-                                                );
+                                                    <td 
+                                                    key={dia} 
+                                                    className={`p-3 border ${color} ${color} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
+                                                    title={estado}
+                                                    onClick={() => celda && seleccionarCelda(celda)}
+                                                />
+                                            )
                                             })}
                                         </tr>
                                     ))}
@@ -354,7 +382,58 @@ export default function OcuparHabitacionPage() {
                             </table>
                         </div>
                     )}
+
+                                    {/* Leyenda dentro del cuadro */}
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 p-4 border-t border-gray-200">
+                    {/* Libre - Verde */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-green-200 border border-green-600"></span>
+                        <span className="text-sm text-gray-700">Libre</span>
+                    </div>
+
+                    {/* Ocupada - Rojo */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-red-300 border border-red-600"></span>
+                        <span className="text-sm text-gray-700">Ocupada</span>
+                    </div>
+
+                    {/* Reservada - Amarillo */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-yellow-200 border border-yellow-600"></span>
+                        <span className="text-sm text-gray-700">Reservada</span>
+                    </div>
+
+                    {/* Fuera de Servicio - Gris */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-gray-300 border border-gray-600"></span>
+                        <span className="text-sm text-gray-700">Fuera de Servicio </span>
+                    </div>
+
+                     {/* Seleccionada - Azul */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-white-200 border border-blue-600"></span>
+                        <span className="text-sm text-gray-700">Seleccionada</span>
+                    </div>
                 </div>
+                
+                <div className="mt-0 flex justify-between items-center pt-4 w-full">
+                    {/* Botón cancelar siempre visible */}
+                    <button
+                        type="button"
+                        onClick={() => router.back()}
+                        className="px-6 py-2 bg-gray-300 text-gray-800 font-bold rounded hover:bg-gray-400 transition-colors"
+                    >
+                        Cancelar
+                    </button>
+
+                    {/* Botón Siguiente: Verificar */}
+                    {seleccion && (
+                        <button onClick={() => setPaso(2)} className="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700 transition-colors">
+                            Siguiente: Verificación
+                        </button>
+                    )}
+                </div>
+            </div>
             )}
 
             {/* PASO 2: BÚSQUEDA AVANZADA (ESTILO MOCKUP) */}
@@ -511,16 +590,14 @@ export default function OcuparHabitacionPage() {
 
                     {/* --- BOTONES DE ACCIÓN FINAL --- */}
                     <div className="flex justify-between pt-4 border-t">
-                        <button 
-                            onClick={() => router.push("/dashboard/habitaciones")} 
-                            className="bg-gray-300 px-6 py-2 rounded font-bold text-gray-700 hover:bg-gray-400 transition"
-                        >
-                            Cancelar
+                        <button onClick={() => setPaso(1)} 
+                        className="px-6 py-2 bg-gray-300 text-gray-800 font-bold rounded hover:bg-gray-400 transition-colors">
+                        ← Volver
                         </button>
                         
                         <div className="flex gap-4">
                             <Link href="/dashboard/huesped/altaHuesped" target="_blank">
-                                <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-bold hover:bg-blue-50 transition">
+                                <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded font-bold hover:text-white hover:bg-blue-600 transition">
                                     Nuevo Huésped
                                 </button>
                             </Link>
