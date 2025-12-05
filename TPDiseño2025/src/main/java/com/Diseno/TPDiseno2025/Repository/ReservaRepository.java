@@ -18,4 +18,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
     List<Reserva> findByEstadoStartingWithIgnoreCase(String estado);
 
+   // Integer findByIDInteger(Integer idReserva);
+
 }

@@ -175,4 +175,12 @@ public class ReservaServiceImp implements ReservaService {
     }
     
 
+
+    @Override
+    public boolean esTitularReserva(Integer dni, Integer idReserva) {
+        boolean esTitular = false;
+        Reserva reserva = reservaRepository.findById(idReserva).orElse(null);
+        if (reserva.getIdReserva().equals(dni)) {}
+        return esTitular;
+    }
 }

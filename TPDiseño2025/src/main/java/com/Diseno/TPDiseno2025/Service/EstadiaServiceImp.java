@@ -45,6 +45,9 @@ public class EstadiaServiceImp implements EstadiaService{
     @Autowired
     DetalleEstadiaRepository detalleEstadiaRepository;
 
+    @Autowired
+    private ReservaService reservaService;
+
 
     @Override
     public void crearEstadia(EstadiaDTO eDTO){
@@ -93,6 +96,11 @@ public class EstadiaServiceImp implements EstadiaService{
             }
 
             Huesped titular = huespedRepository.findById(huespedesDTO.get(0).getDni()).orElseThrow(() -> new RuntimeException("Huesped titular no encontrado"));
+
+            boolean estitular = reservaService.esTitularReserva(titular.getDni(), reserva.getIdReserva());
+            if (!estitular){
+                 throw new RuntimeException("El huésped titular no coincide con la reserva");
+            }
 
             reserva.setHuesped(titular);
             reserva = reservaRepository.save(reserva);
