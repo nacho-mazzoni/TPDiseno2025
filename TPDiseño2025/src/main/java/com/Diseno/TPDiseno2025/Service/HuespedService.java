@@ -42,10 +42,14 @@ public interface HuespedService {
 
     List<HuespedDTO> getByNombreDTO(String nombre);
 
+    List<HuespedDTO> getByApellidoDTO(String apellido);
+
     Boolean existeHuesped(Huesped h);
 
     Huesped findById(Integer idHuesped);
 
     void validarDatos(HuespedDTO hdto);
+
+    List<HuespedDTO> buscarHuespedDTOPorTipoDni(String tipoDoc);
 }
 

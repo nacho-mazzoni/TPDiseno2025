@@ -72,8 +72,7 @@ export default function AltaHuespedPage() {
     }
     
     setForm(prev => {
-        const newState = { ...prev, [name]: value };
-        if (name === "nacionalidad") newState.pais = value; 
+        const newState = { ...prev, [name]: value }; 
         return newState;
     });
 

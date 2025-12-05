@@ -49,4 +49,9 @@ public class HuespedDTO {
     @Size(max = 50)
     private String posIva;
 
+    private String nacionalidad;
+
+    @NotNull
+    private String telefono;
+
 }

@@ -17,11 +17,15 @@ public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
 
     Optional<Huesped> findByTipoDniAndDni(String tipoDni, Integer dni);
 
+    List<Huesped> findByTipoDni(String tipoDni);
+
     Boolean existsByDireccion(Direccion direccion);
 
     Boolean existsByDni(Integer dni);
 
     List<Huesped> findByNombreStartingWithIgnoreCase(String nombre);
+
+    List<Huesped> findByApellidoStartingWithIgnoreCase(String apellido);
 
     Optional<Huesped> findByNombreAndApellidoAndTipoDniAndDni(
         String nombre,
@@ -30,5 +34,4 @@ public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
         Integer dni
     );
 
-    List<Huesped> getByNombre(String nombre);
 }

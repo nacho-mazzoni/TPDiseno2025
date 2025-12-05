@@ -55,6 +55,11 @@ public class HuespedController {
         return ResponseEntity.ok(huespedes);
     }
 
+    @GetMapping("/apellido")
+    public ResponseEntity<List<HuespedDTO>> getHuespedByApellido(@RequestParam @NotBlank final String apellido){
+        return ResponseEntity.ok(huespedservice.getByApellidoDTO(apellido));
+    }
+
     @GetMapping("/getByDni") // Ejemplo: GET /huesped/getByDni?dni=12345
     public ResponseEntity<?> getHuespedByDni(@RequestParam("dni") Integer dni) {
     try {
@@ -80,6 +85,10 @@ public class HuespedController {
         );
     }
 
+    @GetMapping("/buscarPorTipo/{tipodni}")
+    public ResponseEntity<List<HuespedDTO>> getHuespedByTipoDni(@PathVariable @NotNull final String tipodni){
+        return ResponseEntity.ok(huespedservice.buscarHuespedDTOPorTipoDni(tipodni));
+    }
 
     @PostMapping("/crear")
     public ResponseEntity<Integer> createHuesped(@RequestBody @Valid HuespedDTO huespedDTO) {

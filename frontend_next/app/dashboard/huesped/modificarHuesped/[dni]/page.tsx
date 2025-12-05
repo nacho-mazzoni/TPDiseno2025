@@ -187,10 +187,8 @@ export default function ModificarHuespedPage({ params }: { params: Promise<{ dni
         else if (soloNumerosTel.length > 15) {
             registrarError("telefono", "El teléfono no puede tener más de 15 números.");
         }
-    } else {
-        // Si está vacío 
-        registrarError("telefono", "El teléfono es obligatorio.");
     }
+    
     if (form.fechaNacimiento) {
         const edad = calcularEdad(form.fechaNacimiento);
         if (edad < 1) registrarError("fechaNacimiento", "La edad del huésped no es válida.");

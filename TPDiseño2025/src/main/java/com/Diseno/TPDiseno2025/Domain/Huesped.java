@@ -1,7 +1,8 @@
 package com.Diseno.TPDiseno2025.Domain;
 
-import java.time.LocalDate; 
+import java.time.LocalDate;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -44,7 +45,7 @@ public class Huesped {
     @Column(name = "pos_iva", nullable = true)
     private String posIva;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumns({
         @JoinColumn(name = "calle", referencedColumnName = "calle"),
         @JoinColumn(name = "numero", referencedColumnName = "numero"),

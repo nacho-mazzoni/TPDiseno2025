@@ -43,4 +43,12 @@ public class DireccionId implements Serializable {
     public int hashCode() {
         return Objects.hash(calle, numero, departamento, piso, codPostal);
     }
+
+    public DireccionId(String calle, Integer numero, String dept, Integer piso, Integer cod_p){
+        this.calle=calle;
+        this.numero = numero;
+        this.departamento = dept;
+        this.piso = piso;
+        this.codPostal = cod_p;
+    }
 }

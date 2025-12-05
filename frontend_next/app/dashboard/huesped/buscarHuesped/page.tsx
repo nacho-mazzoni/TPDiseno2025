@@ -47,15 +47,21 @@ export default function BuscarHuespedPage() {
       // Identificamos si se está buscando activamente por DNI o Nombre para manejar el modal
       const buscandoPorDni = filtros.dni && filtros.dni.trim() !== '';
       const buscandoPorNombre = filtros.nombre && filtros.nombre.trim() !== '';
-      const buscandoPorFiltro = buscandoPorDni || buscandoPorNombre;
+      const buscandoPorApellido = filtros.apellido && filtros.apellido.trim() !== '';
+      const buscandoPorTipoDoc = filtros.tipoDni && filtros.tipoDni.trim() !== '';
+      const buscandoPorFiltro = buscandoPorDni || buscandoPorNombre || buscandoPorApellido;
 
-
+      // Si ambos están vacíos, la URL queda como '/huespedes/' (Buscar Todos)
       if (buscandoPorDni) {
         url = `http://localhost:8081/huespedes/${filtros.tipoDni}/${filtros.dni}`;
       } else if (buscandoPorNombre) {
         url = `http://localhost:8081/huespedes/nombre?nombre=${filtros.nombre}`;
+      } else if (buscandoPorApellido){
+        url = `http://localhost:8081/huespedes/apellido?apellido=${filtros.apellido}`;
+      } else if (buscandoPorTipoDoc){
+        url = `http://localhost:8081/huespedes/buscarPorTipo/${filtros.tipoDni}`;
       }
-      // Si ambos están vacíos, la URL queda como '/huespedes/' (Buscar Todos)
+      
 
       const response = await fetch(url);
 
