@@ -332,6 +332,11 @@ public class HuespedServiceImp implements HuespedService {
         }
         
         huespedExistente.setDireccion(nuevaDireccion);
+        huespedExistente.setEmail(hDTO.getEmail());
+        huespedExistente.setPosIva(hDTO.getPosIva());
+        huespedExistente.setNombre(hDTO.getNombre());
+        huespedExistente.setApellido(hDTO.getApellido());
+        huespedExistente.setOcupacion(hDTO.getOcupacion());
         huespedRepository.save(huespedExistente);
 
         Telefono tel = new Telefono();
