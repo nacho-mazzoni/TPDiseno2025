@@ -55,7 +55,7 @@ export default function CrearReservaPage() {
     });
 
     // Validación visual de fechas
-    const errorFechas = fechaDesde && fechaHasta && fechaHasta <= fechaDesde;
+    const errorFechas = fechaDesde && fechaHasta && fechaHasta < fechaDesde;
 
     // --- CONFIGURACIÓN SWEETALERT ---
     const Toast = Swal.mixin({
@@ -150,7 +150,7 @@ export default function CrearReservaPage() {
             idHabitacion: celda.idHabitacion,
             fechaInicio: fechaDesde,
             fechaFin: fechaHasta,
-            cantNoches: diffDays
+            cantNoches: diffDays +1
         });
     };
 
