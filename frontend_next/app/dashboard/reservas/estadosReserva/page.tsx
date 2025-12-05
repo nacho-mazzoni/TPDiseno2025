@@ -4,18 +4,13 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Swal from 'sweetalert2'; 
 
+
+
 // --- TIPOS ---
 interface CeldaCalendario {
   fecha: string;
   idHabitacion: number;
   estado: "LIBRE" | "OCUPADA" | "RESERVADA";
-}
-
-interface HuespedForm {
-  dni: string;
-  nombre: string;
-  apellido: string;
-  telefono: string;
 }
 
 interface TipoHabitacion {
@@ -24,7 +19,7 @@ interface TipoHabitacion {
     precioNoche: number;
 }
 
-export default function CrearReservaPage() {
+export default function EstadosPage() {
     const router = useRouter();
     
     // --- ESTADOS ---
@@ -38,22 +33,9 @@ export default function CrearReservaPage() {
     const [tiposHabitacion, setTiposHabitacion] = useState<TipoHabitacion[]>([]);
     const [tipoSeleccionado, setTipoSeleccionado] = useState<string>(""); 
     
-    // Selección temporal
-    const [seleccion, setSeleccion] = useState<{
-        idHabitacion: number;
-        fechaInicio: string;
-        fechaFin: string;
-        cantNoches: number;
-    } | null>(null);
 
-    // Paso 3: Datos Huésped
-    const [huesped, setHuesped] = useState<HuespedForm>({
-        dni: "",
-        nombre: "",
-        apellido: "",
-        telefono: "",
-    });
 
+ 
     // Validación visual de fechas
     const errorFechas = fechaDesde && fechaHasta && fechaHasta <= fechaDesde;
 
@@ -85,17 +67,7 @@ export default function CrearReservaPage() {
         };
         fetchTipos();
 
-        // Verificar reserva pendiente (si vuelve de crear huesped)
-        const reservaPendiente = localStorage.getItem("reservaPendiente");
-        
-        if (reservaPendiente) {
-            const data = JSON.parse(reservaPendiente);
-            setSeleccion(data.seleccion);
-            setHuesped(prev => ({ ...prev, dni: data.dni }));
-            setFechaDesde(data.seleccion.fechaInicio);
-            setFechaHasta(data.seleccion.fechaFin);
-            setPaso(3);
-        }
+       
     }, []);
 
     // --- LOGICA PASO 1: MOSTRAR ESTADO HABITACIONES ---
@@ -126,166 +98,26 @@ export default function CrearReservaPage() {
         }
     };
 
-    const seleccionarCelda = (celda: CeldaCalendario) => {
-        if (celda.estado !== "LIBRE") {
-            Toast.fire({
-                icon: "error",
-                title: "La habitación seleccionada no está disponible."
-            });
-            return;
-        }
 
-        const fInicio = new Date(fechaDesde);
-        const fFin = new Date(fechaHasta);
-        const diffTime = Math.abs(fFin.getTime() - fInicio.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-        setSeleccion({
-            idHabitacion: celda.idHabitacion,
-            fechaInicio: fechaDesde,
-            fechaFin: fechaHasta,
-            cantNoches: diffDays
-        });
-    };
-
-    // --- LOGICA PASO 2: VERIFICACIÓN ---
-    const handleAceptarVerificacion = () => {
-        setPaso(3);
-    };
-
-    const handleRechazarVerificacion = () => {
-        setSeleccion(null);
-        setPaso(1);
-    };
-
-    // --- LOGICA PASO 3: CONFIRMAR CON SWEETALERT ---
-    const finalizarReserva = async () => {
-        if(!seleccion) return;
-        
-        if (!huesped.dni) {
-            Toast.fire({
-                icon: "warning",
-                title: "Por favor ingrese el DNI del huésped."
-            });
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            // 1. Verificar si el huésped existe
-            const checkRes = await fetch(`http://localhost:8081/huespedes/getByDni?dni=${huesped.dni}`);
-
-            if (checkRes.status === 404) {
-                setLoading(false);
-                
-                // MODAL BONITO PARA PREGUNTAR
-                const resultado = await Swal.fire({
-                    title: 'Huésped no encontrado',
-                    text: `El DNI ${huesped.dni} no figura en el sistema. ¿Desea registrarlo ahora?`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, registrar',
-                    cancelButtonText: 'Cancelar'
-                });
-
-                if (resultado.isConfirmed) {
-                    const estadoAGuardar = {
-                        seleccion: seleccion,
-                        dni: huesped.dni
-                    };
-                    localStorage.setItem("reservaPendiente", JSON.stringify(estadoAGuardar));
-                    router.push("/dashboard/huesped/altaHuesped?returnTo=reserva"); 
-                }
-                return; 
-            }
-
-            // --- CASO: HUÉSPED SÍ EXISTE ---
-            const payload = {
-                reserva: {
-                    cantHuesped: 1,
-                    fechaInicio: seleccion.fechaInicio,
-                    cantNoches: seleccion.cantNoches,
-                    descuento: false,
-                    estado: "Confirmada",
-                    idHuesped: parseInt(huesped.dni)
-                },
-                huesped: {
-                    dni: parseInt(huesped.dni),
-                    nombre: "",   
-                    apellido: "", 
-                    tipoDni: "DNI",
-                    direccion: null 
-                },
-                habitacion: {
-                    idHabitacion: seleccion.idHabitacion,
-                    idTipo: 1, 
-                    estado: "ocupada", 
-                    nochesDescuento: 0
-                }
-            };
-
-            const res = await fetch("http://localhost:8081/reservas/crear", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if(res.ok) {
-                // EXITO: TOAST VERDE
-                Toast.fire({
-                    icon: "success",
-                    title: "¡Reserva registrada con éxito!"
-                });
-                
-                localStorage.removeItem("reservaPendiente");
-                
-                setTimeout(() => {
-                    router.push("/dashboard/reservas");
-                }, 1500);
-
-            } else {
-                const txt = await res.text();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error al registrar",
-                    text: txt
-                });
-            }
-
-        } catch (e) {
-            console.error(e);
-            Toast.fire({
-                icon: "error",
-                title: "Error de conexión con el servidor."
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // --- RENDERIZADO ---
     const getDias = () => Array.from(new Set(disponibilidad.map(c => c.fecha))).sort();
     const getHabitaciones = () => Array.from(new Set(disponibilidad.map(c => c.idHabitacion))).sort((a,b) => a-b);
 
     return (
-        <div className="p-6 max-w-6xl mx-auto font-sans text-gray-800">
+        <div className="p-3 max-w-6xl mx-auto font-sans text-gray-800">
         
         {/* HEADER PASOS */}
-        <div className="mb-8 flex justify-between items-center bg-gray-100 p-4 rounded-lg">
-            <div className={`font-bold ${paso === 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Selección</div>
-            <div className="text-gray-400">→</div>
-            <div className={`font-bold ${paso === 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Verificación</div>
-            <div className="text-gray-400">→</div>
-            <div className={`font-bold ${paso === 3 ? 'text-blue-600' : 'text-gray-400'}`}>3. Datos Huésped</div>
+        <div className="mb-8 flex justify-center items-center bg-gray-100 p-0.5 rounded-lg">
+           
+            <div className={`font-bold text-4xl 'text-blue-600' : 'text-gray-400'}`}>Estado Habitaciones</div>
+            
         </div>
 
         {/* --- VISTA 1: GRILLA DE DISPONIBILIDAD --- */}
-        {paso === 1 && (
+        { (
             <div className="bg-white shadow rounded-lg p-6 border">
-                <h2 className="text-xl font-bold mb-4">Buscar Disponibilidad</h2>
                 
                 <div className="flex gap-4 mb-6 items-end flex-wrap">
                     <div>
@@ -334,39 +166,36 @@ export default function CrearReservaPage() {
                 </div>
 
                 {/* TABLA */}
+               
                 {disponibilidad.length > 0 && (
-                    <div className="overflow-auto border rounded">
-                        <table className="w-full text-center border-collapse">
-                            <thead className="bg-gray-200">
+                    <div id="taula" className="relative border rounded overflow-auto max-h-[60vh]">
+                        <table className="min-w-full text-center border-collapse">
+                            <thead className="bg-gray-200 sticky top-0 z-30">
                                 <tr>
-                                    <th className="p-3 border sticky left-0 bg-gray-200">Habitación</th>
+                                    <th className="p-3 border sticky left-0 top-0 z-40 bg-gray-200 whitespace-nowrap">Habitación</th>
                                     {getDias().map(dia => (
-                                        <th key={dia} className="p-3 border min-w-[100px]">{dia}</th>
+                                        <th key={dia} className="p-3 border min-w-[100px] whitespace-nowrap">{dia}</th>
                                     ))}
                                 </tr>
                             </thead>
                              <tbody>
                                 {getHabitaciones().map(idHab => (
                                     <tr key={idHab}>
-                                        <td className="p-3 border font-bold bg-gray-50">Hab {idHab}</td>
+                                        <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
                                         {getDias().map(dia => {
                                             const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
                                             const estado = celda ? celda.estado : "DESCONOCIDO";
                                             
-                                            let bgClass = "bg-green-200 hover:bg-green-300 "; 
-                                            if(estado === "OCUPADA") bgClass = "bg-red-300 ";
-                                            if(estado === "RESERVADA") bgClass = "bg-yellow-200 ";
+                                            let bgClass = "bg-green-200"; 
+                                            if(estado === "OCUPADA") bgClass = "bg-red-300";
+                                            if(estado === "RESERVADA") bgClass = "bg-yellow-200";
                                             
-                                            const isSelected = seleccion?.idHabitacion === idHab;
-
                                             return (
                                                 <td 
                                                     key={dia} 
-                                                    className={`p-3 border ${bgClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
-                                                    onClick={() => celda && seleccionarCelda(celda)}
-                                                >
-                                                    {estado === "LIBRE" ? "Libre" : "Ocupada"}
-                                                </td>
+                                                    className={`p-3 border ${bgClass} text-center font-semibold`}
+                                                    title={estado}
+                                                />
                                             )
                                         })}
                                     </tr>
@@ -375,12 +204,48 @@ export default function CrearReservaPage() {
                         </table>
                     </div>
                 )}
-                
-                
-            </div>
-        )}
 
-       
+                {/* Leyenda dentro del cuadro */}
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 p-4 border-t border-gray-200">
+                    {/* Libre - Verde */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-green-200 border border-green-600"></span>
+                        <span className="text-sm text-gray-700">Libre</span>
+                    </div>
+
+                    {/* Ocupada - Rojo */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-red-300 border border-red-600"></span>
+                        <span className="text-sm text-gray-700">Ocupada</span>
+                    </div>
+
+                    {/* Reservada - Amarillo */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-yellow-200 border border-yellow-600"></span>
+                        <span className="text-sm text-gray-700">Reservada</span>
+                    </div>
+
+                    {/* Fuera de Servicio - Gris */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-gray-300 border border-gray-600"></span>
+                        <span className="text-sm text-gray-700">Fuera de Servicio </span>
+                    </div>
+
+                    {/* Pie con botón cancelar a la derecha */}
+                    <div className="w-full flex justify-i mt-0">
+                        <button
+                            type="button"
+                            onClick={() => router.back()}
+                            className="px-6 py-2 bg-gray-300 text-gray-800 font-bold rounded hover:bg-gray-400 transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        )}
 
         </div>
     );

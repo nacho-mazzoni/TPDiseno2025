@@ -37,3 +37,9 @@ input[type=number] {
   appearance: textfield;
   -moz-appearance: textfield;
 }
+
+#taula {
+    height: 570px !important;
+    overflow: auto;
+    width: 1070px;
+}

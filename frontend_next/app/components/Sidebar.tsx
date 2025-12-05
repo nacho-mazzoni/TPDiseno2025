@@ -36,7 +36,7 @@ export default function Sidebar() {
       {/* Parte Superior: Logo y Menú */}
       <div>
         <div className="p-6 text-2xl font-bold text-center border-b border-gray-700">
-          Hotel System 🏨
+          Gestion Hotelera 🏨
         </div>
 
         <nav className="mt-6 px-4 space-y-2">

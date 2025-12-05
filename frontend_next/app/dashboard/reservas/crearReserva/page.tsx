@@ -277,10 +277,10 @@ export default function CrearReservaPage() {
     const getHabitaciones = () => Array.from(new Set(disponibilidad.map(c => c.idHabitacion))).sort((a,b) => a-b);
 
     return (
-        <div className="p-6 max-w-6xl mx-auto font-sans text-gray-800">
+        <div className="p-3 max-w-6xl mx-auto font-sans text-gray-800">
         
         {/* HEADER */}
-        <div className="mb-8 flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+        <div className="mb-8 flex justify-between items-center bg-gray-100 p-0.5 rounded-lg">
             <div className={`font-bold ${paso === 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Selección</div>
             <div className="text-gray-400">→</div>
             <div className={`font-bold ${paso === 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Verificación</div>
@@ -291,7 +291,6 @@ export default function CrearReservaPage() {
         {/* --- GRILLA DE DISPONIBILIDAD --- */}
         {paso === 1 && (
             <div className="bg-white shadow rounded-lg p-6 border">
-                <h2 className="text-xl font-bold mb-4">Buscar Disponibilidad</h2>
                 
                 <div className="flex gap-4 mb-6 items-end flex-wrap">
                     <div>
@@ -341,38 +340,38 @@ export default function CrearReservaPage() {
 
                 {/* TABLA */}
                 {disponibilidad.length > 0 && (
-                    <div className="overflow-auto border rounded">
-                        <table className="w-full text-center border-collapse">
-                            <thead className="bg-gray-200">
+                    <div id="taula" className="relative border rounded overflow-auto max-h-[60vh]">
+                        <table className="min-w-full text-center border-collapse">
+                            <thead className="bg-gray-200 sticky top-0 z-30">
                                 <tr>
-                                    <th className="p-3 border sticky left-0 bg-gray-200">Habitación</th>
+                                    <th className="p-3 border sticky left-0 top-0 z-40 bg-gray-200 whitespace-nowrap">Habitación</th>
                                     {getDias().map(dia => (
-                                        <th key={dia} className="p-3 border min-w-[100px]">{dia}</th>
+                                        <th key={dia} className="p-3 border min-w-[100px] whitespace-nowrap">{dia}</th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody>
                                 {getHabitaciones().map(idHab => (
                                     <tr key={idHab}>
-                                        <td className="p-3 border font-bold bg-gray-50">Hab {idHab}</td>
+                                        <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
                                         {getDias().map(dia => {
                                             const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
                                             const estado = celda ? celda.estado : "DESCONOCIDO";
                                             
-                                            let bgClass = "bg-green-200 hover:bg-green-300 cursor-pointer"; 
-                                            if(estado === "OCUPADA") bgClass = "bg-red-300 cursor-not-allowed";
-                                            if(estado === "RESERVADA") bgClass = "bg-yellow-200 cursor-not-allowed";
+                                            let bgClass = "bg-green-200"; 
+                                            let cursorClass = "cursor-pointer";
+                                            if(estado === "OCUPADA") { bgClass = "bg-red-300"; cursorClass = "cursor-not-allowed"; }
+                                            if(estado === "RESERVADA") { bgClass = "bg-yellow-200"; cursorClass = "cursor-not-allowed"; }
                                             
                                             const isSelected = seleccion?.idHabitacion === idHab;
 
                                             return (
                                                 <td 
                                                     key={dia} 
-                                                    className={`p-3 border ${bgClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
+                                                    className={`p-3 border ${bgClass} ${cursorClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
+                                                    title={estado}
                                                     onClick={() => celda && seleccionarCelda(celda)}
-                                                >
-                                                    {estado === "LIBRE" ? "Libre" : "Ocupada"}
-                                                </td>
+                                                />
                                             )
                                         })}
                                     </tr>
@@ -381,13 +380,51 @@ export default function CrearReservaPage() {
                         </table>
                     </div>
                 )}
+
+                {/* Leyenda dentro del cuadro */}
+                <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 p-4 border-t border-gray-200">
+                    {/* Libre - Verde */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-green-200 border border-green-600"></span>
+                        <span className="text-sm text-gray-700">Libre</span>
+                    </div>
+
+                    {/* Ocupada - Rojo */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-red-300 border border-red-600"></span>
+                        <span className="text-sm text-gray-700">Ocupada</span>
+                    </div>
+
+                    {/* Reservada - Amarillo */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-yellow-200 border border-yellow-600"></span>
+                        <span className="text-sm text-gray-700">Reservada</span>
+                    </div>
+
+                    {/* Fuera de Servicio - Gris */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-gray-300 border border-gray-600"></span>
+                        <span className="text-sm text-gray-700">Fuera de Servicio </span>
+                    </div>
+
+                     {/* Seleccionada - Azul */}
+                    <div className="flex items-center space-x-2">
+                        <span className="w-4 h-4 rounded-full bg-white-200 border border-blue-600"></span>
+                        <span className="text-sm text-gray-700">Seleccionada</span>
+                    </div>
+                </div>
                 
-                <div className="mt-4 flex justify-between items-center border-t pt-4">
+                <div className="mt-0 flex justify-between items-center pt-4 w-full">
                     {/* Botón cancelar siempre visible */}
-                    <button onClick={handleCancelarProceso} className="bg-gray-400 text-white px-6 py-2 rounded font-bold hover:bg-gray-500">
+                    <button
+                        type="button"
+                        onClick={() => router.back()}
+                        className="px-6 py-2 bg-gray-300 text-gray-800 font-bold rounded hover:bg-gray-400 transition-colors"
+                    >
                         Cancelar
                     </button>
 
+                    {/* Botón Siguiente: Verificar */}
                     {seleccion && (
                         <button onClick={() => setPaso(2)} className="bg-blue-600 text-white px-6 py-2 rounded font-bold">
                             Siguiente: Verificar
