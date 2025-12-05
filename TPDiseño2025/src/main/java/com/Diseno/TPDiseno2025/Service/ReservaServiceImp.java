@@ -138,13 +138,13 @@ public class ReservaServiceImp implements ReservaService {
         LocalDate fechaInicio = LocalDate.parse(inicioStr);
         LocalDate fechaFin = LocalDate.parse(finStr);
 
-        // 1. Traer todo lo necesario
+        //  Traer todo lo necesario
         List<Habitacion> todasLasHabitaciones = habitacionService.obtenerTodasPorTipo(idTipo);
         List<DetalleReserva> ocupaciones = detalleService.buscarReservasEnConflicto(fechaInicio, fechaFin);
         
         List<CeldaCalendarioDTO> grilla = new ArrayList<>();
 
-        // 2. Recorrer día por día
+        //  Recorrer día por día
         for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
             
             final LocalDate fechaActual = fecha; 
@@ -152,6 +152,7 @@ public class ReservaServiceImp implements ReservaService {
             for (Habitacion habitacion : todasLasHabitaciones) {
                 
                 String estadoCelda = "LIBRE"; // Verde por defecto
+                Integer idReservaEncontrada = null;
 
                 // Buscamos si hay alguna reserva que ocupe esta habitación en esta fecha
                 DetalleReserva detalle = ocupaciones.stream()
@@ -165,6 +166,7 @@ public class ReservaServiceImp implements ReservaService {
 
                 if (detalle != null) {
                     String estadoRealBD = detalle.getReserva().getEstado();
+                    idReservaEncontrada = detalle.getReserva().getIdReserva();
 
                     if (estadoRealBD != null && estadoRealBD.trim().equalsIgnoreCase("Confirmada")) {
                         estadoCelda = "RESERVADA"; // Amarillo
@@ -172,7 +174,7 @@ public class ReservaServiceImp implements ReservaService {
                         estadoCelda = "OCUPADA"; // Rojo
                     }
                 }
-                grilla.add(new CeldaCalendarioDTO(fechaActual.toString(), habitacion.getIdHabitacion(), estadoCelda));
+                grilla.add(new CeldaCalendarioDTO(fechaActual.toString(), habitacion.getIdHabitacion(), estadoCelda, idReservaEncontrada));
             }
         }
         return grilla;

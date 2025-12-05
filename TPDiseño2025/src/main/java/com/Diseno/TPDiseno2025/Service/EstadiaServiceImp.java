@@ -74,11 +74,29 @@ public class EstadiaServiceImp implements EstadiaService{
 
         Reserva reserva;
         double precioHab = 0.0;
-         double precioTotal = 0.0;
+        double precioTotal = 0.0;
         
         //Obtener o Crear Reserva 
         if (idReservaPrevia != null) {
             reserva = reservaRepository.findById(idReservaPrevia).orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+
+            if (huespedesDTO == null || huespedesDTO.isEmpty()) {
+                throw new RuntimeException("Debe ingresar un huésped titular.");
+            }
+
+            HuespedDTO huespedEntrante = huespedesDTO.get(0);
+            Huesped titularReal = reserva.getHuesped();
+
+            if (!titularReal.getDni().equals(huespedEntrante.getDni())) {
+                throw new RuntimeException("ERROR: El huésped ingresado (" + huespedEntrante.getApellido() + ") no es el titular de la reserva. El titular es: " + titularReal.getApellido() + ", " + titularReal.getNombre());
+            }
+
+            reserva.setEstado("Ocupada");
+            if(!habitacionesDTO.isEmpty()){
+                Habitacion habitacion = habitacionRepository.findById(habitacionesDTO.get(0).getIdHabitacion()).orElse(null);
+                 if(habitacion != null) precioHab = habitacion.getIdTipo().getPrecioNoche();
+            }
+
         } else {
             reserva = new Reserva();
             reserva.setFechaInicio(fechaInicio);

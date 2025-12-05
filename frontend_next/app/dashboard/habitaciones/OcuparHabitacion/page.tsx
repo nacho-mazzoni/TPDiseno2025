@@ -10,6 +10,7 @@ interface CeldaCalendario {
     fecha: string;
     idHabitacion: number;
     estado: "LIBRE" | "OCUPADA" | "RESERVADA";
+    idReserva?: number | null;
 }
 
 interface TipoHabitacion {
@@ -70,7 +71,7 @@ export default function OcuparHabitacionPage() {
     });
 
         const seleccionarCelda = (celda: CeldaCalendario, rowHasBlockedCells: boolean) => {
-        if (celda.estado !== "LIBRE" || rowHasBlockedCells) {
+        if (celda.estado !== "LIBRE" && celda.estado !== "RESERVADA" || rowHasBlockedCells) {
             Toast.fire({
                 icon: "error",
                 title: "La habitación seleccionada no está disponible."
@@ -117,17 +118,19 @@ export default function OcuparHabitacionPage() {
         } finally { setLoading(false); }
     };
 
-    const handleCellClick = async (celda: CeldaCalendario) => {
-        if (celda.estado === "OCUPADA") {
+    const handleCellClick = async (celda: CeldaCalendario, rowHasBlockedCells: boolean) => {
+        if ((celda.estado === "OCUPADA" || rowHasBlockedCells)&& celda.estado !== "RESERVADA"){
             Swal.fire({ icon: "error", title: "Habitación Ocupada", text: "No se puede seleccionar." });
             return;
         }
+
+        const idReservaDetectada = celda.idReserva ? celda.idReserva : null;
 
         const nuevaSeleccion = {
             idHabitacion: celda.idHabitacion,
             fechaInicio: fechaDesde,
             fechaFin: fechaHasta,
-            idReservaPrevia: null
+            idReservaPrevia: idReservaDetectada,
         };
 
         if (celda.estado === "RESERVADA") {
@@ -372,17 +375,14 @@ export default function OcuparHabitacionPage() {
                                                     let color = "bg-green-200 hover:bg-green-300 cursor-pointer";
                                                     if(rowHasBlockedCells && estado === "LIBRE") color = "bg-green-200 cursor-not-allowed";
                                                     if (estado === "OCUPADA") color = "bg-red-300 cursor-not-allowed";
-                                                    if (estado === "RESERVADA") color = "bg-yellow-200 cursor-not-allowed";
+                                                    if (estado === "RESERVADA") color = "bg-yellow-200 hover:bg-yellow-300 cursor-pointer";
 
                                                     const isSelected = seleccion?.idHabitacion === idHab;
 
                                                     return (
-                                                        <td 
-                                                        key={dia} 
-                                                        className={`p-3 border ${color} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
-                                                        title={estado}
-                                                        onClick={() => celda && seleccionarCelda(celda, rowHasBlockedCells)}
-                                                    />
+                                                        <td key={dia} className={`p-3 border ${color}`} 
+                                                        onClick={() => celda && handleCellClick(celda, rowHasBlockedCells)}>
+                                                    </td>
                                                 )
                                                 })}
                                             </tr>
