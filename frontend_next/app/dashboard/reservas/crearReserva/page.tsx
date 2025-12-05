@@ -132,8 +132,8 @@ export default function CrearReservaPage() {
         }
     };
 
-    const seleccionarCelda = (celda: CeldaCalendario) => {
-        if (celda.estado !== "LIBRE") {
+    const seleccionarCelda = (celda: CeldaCalendario, rowHasBlockedCells: boolean) => {
+        if (celda.estado !== "LIBRE" || rowHasBlockedCells) {
             Toast.fire({
                 icon: "error",
                 title: "La habitación seleccionada no está disponible."
@@ -351,30 +351,40 @@ export default function CrearReservaPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {getHabitaciones().map(idHab => (
-                                    <tr key={idHab}>
-                                        <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
-                                        {getDias().map(dia => {
-                                            const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
-                                            const estado = celda ? celda.estado : "DESCONOCIDO";
-                                            
-                                            let bgClass = "bg-green-200 hover:bg-green-300 cursor-pointer";
-                                            if (estado === "OCUPADA") bgClass = "bg-red-300 cursor-not-allowed";
-                                            if (estado === "RESERVADA") bgClass = "bg-yellow-200 hover:bg-yellow-300 cursor-pointer";
-                                            
-                                            const isSelected = seleccion?.idHabitacion === idHab;
+                                {getHabitaciones().map(idHab => {
+                                    // Verificar si la fila tiene celdas ocupadas o reservadas
+                                    const rowHasBlockedCells = getDias().some(dia => {
+                                        const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
+                                        const estado = celda ? celda.estado : "DESCONOCIDO";
+                                        return estado === "OCUPADA" || estado === "RESERVADA";
+                                    });
 
-                                            return (
-                                                <td 
-                                                    key={dia} 
-                                                    className={`p-3 border ${bgClass} ${bgClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
-                                                    title={estado}
-                                                    onClick={() => celda && seleccionarCelda(celda)}
-                                                />
-                                            )
-                                        })}
-                                    </tr>
-                                ))}
+                                    return (
+                                        <tr key={idHab}>
+                                            <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
+                                            {getDias().map(dia => {
+                                                const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
+                                                const estado = celda ? celda.estado : "DESCONOCIDO";
+                                                
+                                                let bgClass = "bg-green-200 hover:bg-green-300 cursor-pointer";
+                                                if(rowHasBlockedCells && estado === "LIBRE") bgClass = "bg-green-200 cursor-not-allowed";
+                                                if (estado === "OCUPADA") bgClass = "bg-red-300 cursor-not-allowed";
+                                                if (estado === "RESERVADA") bgClass = "bg-yellow-200 cursor-not-allowed";
+                                                
+                                                const isSelected = seleccion?.idHabitacion === idHab;
+
+                                                return (
+                                                    <td 
+                                                        key={dia} 
+                                                        className={`p-3 border ${bgClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
+                                                        title={estado}
+                                                        onClick={() => celda && seleccionarCelda(celda, rowHasBlockedCells)}
+                                                    />
+                                                )
+                                            })}
+                                        </tr>
+                                    )
+                                })}
                             </tbody>
                         </table>
                     </div>
