@@ -280,7 +280,7 @@ export default function CrearReservaPage() {
         <div className="p-3 max-w-6xl mx-auto font-sans text-gray-800">
         
         {/* HEADER */}
-        <div className="mb-8 flex justify-between items-center bg-gray-100 p-0.5 rounded-lg">
+        <div className="mb-8 flex justify-center items-center bg-gray-100 p-0.5 rounded-lg space-x-50">
             <div className={`font-bold ${paso === 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Selección</div>
             <div className="text-gray-400">→</div>
             <div className={`font-bold ${paso === 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Verificación</div>
@@ -341,12 +341,12 @@ export default function CrearReservaPage() {
                 {/* TABLA */}
                 {disponibilidad.length > 0 && (
                     <div id="taula" className="relative border rounded overflow-auto max-h-[60vh]">
-                        <table className="min-w-full text-center border-collapse">
+                        <table className="min-w-full table-fixed text-center border-collapse">
                             <thead className="bg-gray-200 sticky top-0 z-30">
                                 <tr>
                                     <th className="p-3 border sticky left-0 top-0 z-40 bg-gray-200 whitespace-nowrap">Habitación</th>
                                     {getDias().map(dia => (
-                                        <th key={dia} className="p-3 border min-w-[100px] whitespace-nowrap">{dia}</th>
+                                        <th key={dia} className="p-3 border w-[100px] whitespace-nowrap">{dia}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -361,7 +361,7 @@ export default function CrearReservaPage() {
 
                                     return (
                                         <tr key={idHab}>
-                                            <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 min-w-[120px]">Hab {idHab}</td>
+                                            <td className="p-3 border sticky left-0 z-20 font-bold bg-gray-50 w-[200px]">Hab {idHab}</td>
                                             {getDias().map(dia => {
                                                 const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
                                                 const estado = celda ? celda.estado : "DESCONOCIDO";
