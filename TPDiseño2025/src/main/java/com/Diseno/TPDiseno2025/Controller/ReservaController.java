@@ -1,7 +1,5 @@
 package com.Diseno.TPDiseno2025.Controller;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Diseno.TPDiseno2025.Domain.DetalleReserva;
 import com.Diseno.TPDiseno2025.Model.CeldaCalendarioDTO;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
 import com.Diseno.TPDiseno2025.Model.HuespedDTO;

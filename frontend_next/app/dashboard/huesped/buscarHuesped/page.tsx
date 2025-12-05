@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -44,40 +44,83 @@ export default function BuscarHuespedPage() {
 
     try {
       let url = 'http://localhost:8081/huespedes/';
+      // Identificamos si se está buscando activamente por DNI o Nombre para manejar el modal
+      const buscandoPorDni = filtros.dni && filtros.dni.trim() !== '';
+      const buscandoPorNombre = filtros.nombre && filtros.nombre.trim() !== '';
+      const buscandoPorFiltro = buscandoPorDni || buscandoPorNombre;
 
-      if (filtros.dni && filtros.dni.trim() != '') {
+
+      if (buscandoPorDni) {
         url = `http://localhost:8081/huespedes/${filtros.tipoDni}/${filtros.dni}`;
-      } else if (filtros.nombre) {
+      } else if (buscandoPorNombre) {
         url = `http://localhost:8081/huespedes/nombre?nombre=${filtros.nombre}`;
       }
+      // Si ambos están vacíos, la URL queda como '/huespedes/' (Buscar Todos)
 
       const response = await fetch(url);
 
+      // MANEJO DE ERRORES 
       if (!response.ok) {
-        const resultado = await Swal.fire({
-            title: 'Huésped no encontrado',
-            text: `El DNI ${filtros.dni} no figura en el sistema. ¿Desea registrarlo ahora?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, registrar',
-            cancelButtonText: 'Cancelar'
-        });
+        // Si la búsqueda fue por DNI y el servidor responde con 404/error (Recurso no encontrado)
+        if (buscandoPorDni) {
+            const resultado = await Swal.fire({
+                title: 'Huésped no encontrado',
+                text: `El DNI ${filtros.dni} no figura en el sistema. ¿Desea registrarlo ahora?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, registrar',
+                cancelButtonText: 'Cancelar'
+            });
 
-        if (resultado.isConfirmed) router.push("/dashboard/huesped/altaHuesped");
-        return;
+            if (resultado.isConfirmed) router.push("/dashboard/huesped/altaHuesped");
+            setBusquedaRealizada(true);
+            return;
+        } else {
+            // Error en otra búsqueda (Nombre o Buscar Todos) o error grave del servidor
+            const errorText = await response.text();
+            setError(`Error ${response.status}: ${errorText || 'Error desconocido del servidor.'}`);
+            setBusquedaRealizada(true);
+            return;
+        }
       }
 
+      // MANEJO DE RESULTADOS EXITOSOS (response.ok = true)
       const data = await response.json();
+      // Aseguramos que data sea siempre una lista. Si es un objeto, lo ponemos en una lista.
+      const lista = Array.isArray(data) ? data : (data ? [data] : []); 
       
-      const lista = Array.isArray(data) ? data : [data];
-      
+      // Si la búsqueda fue exitosa, pero no se encontraron resultados
+      if (lista.length === 0) {
+        setBusquedaRealizada(true);
+
+        // Si se usó un filtro (DNI o Nombre) y no hubo resultados, mostramos el modal de sugerencia de registro.
+        if (buscandoPorFiltro) {
+             const resultado = await Swal.fire({
+                title: 'Huésped no encontrado',
+                text: `No se encontraron huéspedes con el criterio de búsqueda. ¿Desea registrarlo ahora?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, registrar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (resultado.isConfirmed) router.push("/dashboard/huesped/altaHuesped");
+        }
+        setResultados([]); 
+        return; 
+      }
+
+      // 3. Resultado OK
       setResultados(lista);
       setBusquedaRealizada(true); 
 
     } catch (err: any) {
       setError(err.message);
+      setBusquedaRealizada(true);
     } finally {
       setLoading(false);
     }
@@ -100,16 +143,16 @@ export default function BuscarHuespedPage() {
   return (
     <div className="max-w-5xl mx-auto p-4">
       
-      {/* 1. TÍTULO GRANDE Y CENTRADO */}
+      {/* TÍTULO  */}
       <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-10 tracking-tight">
         Búsqueda de Huéspedes
       </h1>
 
-      {/* 2. TARJETA DEL FORMULARIO */}
+      {/*  FORMULARIO */}
       <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
         <form onSubmit={handleBuscar} className="space-y-8">
           
-          {/* Fila 1: Apellido y Nombre */}
+          {/*  Apellido y Nombre */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col gap-2">
               <label className="font-bold text-gray-700">Apellido</label>
@@ -136,7 +179,7 @@ export default function BuscarHuespedPage() {
             </div>
           </div>
 
-          {/* Fila 2: Documento */}
+          {/* Documento */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col gap-2">
               <label className="font-bold text-gray-700">Tipo Documento</label>
@@ -192,7 +235,7 @@ export default function BuscarHuespedPage() {
         </form>
       </div>
 
-      {/* 3. SECCIÓN DE RESULTADOS (Oculta hasta buscar) */}
+      {/* RESULTADOS (Oculta hasta buscar) */}
       {busquedaRealizada && (
         <div className="mt-10 animate-fade-in-up">
           

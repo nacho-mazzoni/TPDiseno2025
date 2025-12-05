@@ -1,3 +1,387 @@
-export default function EstadosPage() {
-  return <h1 className="text-2xl font-bold text-gray-800">Gestión de Estados</h1>;
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Swal from 'sweetalert2'; 
+
+// --- TIPOS ---
+interface CeldaCalendario {
+  fecha: string;
+  idHabitacion: number;
+  estado: "LIBRE" | "OCUPADA" | "RESERVADA";
+}
+
+interface HuespedForm {
+  dni: string;
+  nombre: string;
+  apellido: string;
+  telefono: string;
+}
+
+interface TipoHabitacion {
+    idTipo: number;
+    nombreTipo: string;
+    precioNoche: number;
+}
+
+export default function CrearReservaPage() {
+    const router = useRouter();
+    
+    // --- ESTADOS ---
+    const [paso, setPaso] = useState<1 | 2 | 3>(1);
+    const [loading, setLoading] = useState(false);
+
+    // Paso 1: Búsqueda y Selección
+    const [fechaDesde, setFechaDesde] = useState("");
+    const [fechaHasta, setFechaHasta] = useState("");
+    const [disponibilidad, setDisponibilidad] = useState<CeldaCalendario[]>([]);
+    const [tiposHabitacion, setTiposHabitacion] = useState<TipoHabitacion[]>([]);
+    const [tipoSeleccionado, setTipoSeleccionado] = useState<string>(""); 
+    
+    // Selección temporal
+    const [seleccion, setSeleccion] = useState<{
+        idHabitacion: number;
+        fechaInicio: string;
+        fechaFin: string;
+        cantNoches: number;
+    } | null>(null);
+
+    // Paso 3: Datos Huésped
+    const [huesped, setHuesped] = useState<HuespedForm>({
+        dni: "",
+        nombre: "",
+        apellido: "",
+        telefono: "",
+    });
+
+    // Validación visual de fechas
+    const errorFechas = fechaDesde && fechaHasta && fechaHasta <= fechaDesde;
+
+    // --- CONFIGURACIÓN SWEETALERT (TOAST) ---
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    useEffect(() => {
+        // Cargar tipos de habitación
+        const fetchTipos = async () => {
+            try {
+                const res = await fetch("http://localhost:8081/tiposhabitacion");
+                if (res.ok) {
+                    const data = await res.json();
+                    setTiposHabitacion(data);
+                }
+            } catch (error) {
+                console.error("Error cargando tipos:", error);
+            }
+        };
+        fetchTipos();
+
+        // Verificar reserva pendiente (si vuelve de crear huesped)
+        const reservaPendiente = localStorage.getItem("reservaPendiente");
+        
+        if (reservaPendiente) {
+            const data = JSON.parse(reservaPendiente);
+            setSeleccion(data.seleccion);
+            setHuesped(prev => ({ ...prev, dni: data.dni }));
+            setFechaDesde(data.seleccion.fechaInicio);
+            setFechaHasta(data.seleccion.fechaFin);
+            setPaso(3);
+        }
+    }, []);
+
+    // --- LOGICA PASO 1: MOSTRAR ESTADO HABITACIONES ---
+    const buscarDisponibilidad = async () => {
+        if(!fechaDesde || !fechaHasta) {
+            Toast.fire({
+                icon: "warning",
+                title: "Por favor seleccione un rango de fechas."
+            });
+            return;
+        }
+        setLoading(true);
+        try {
+            let url = `http://localhost:8081/reservas/disponibilidad?fechaInicio=${fechaDesde}&fechaFin=${fechaHasta}`;
+            
+            if (tipoSeleccionado) {
+                url += `&idTipo=${tipoSeleccionado}`;
+            }
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Error al conectar con backend");
+            const data = await res.json();
+            setDisponibilidad(data);
+        } catch (e) {
+            console.error(e);
+            Swal.fire("Error", "No se pudo conectar con el servidor.", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const seleccionarCelda = (celda: CeldaCalendario) => {
+        if (celda.estado !== "LIBRE") {
+            Toast.fire({
+                icon: "error",
+                title: "La habitación seleccionada no está disponible."
+            });
+            return;
+        }
+
+        const fInicio = new Date(fechaDesde);
+        const fFin = new Date(fechaHasta);
+        const diffTime = Math.abs(fFin.getTime() - fInicio.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+        setSeleccion({
+            idHabitacion: celda.idHabitacion,
+            fechaInicio: fechaDesde,
+            fechaFin: fechaHasta,
+            cantNoches: diffDays
+        });
+    };
+
+    // --- LOGICA PASO 2: VERIFICACIÓN ---
+    const handleAceptarVerificacion = () => {
+        setPaso(3);
+    };
+
+    const handleRechazarVerificacion = () => {
+        setSeleccion(null);
+        setPaso(1);
+    };
+
+    // --- LOGICA PASO 3: CONFIRMAR CON SWEETALERT ---
+    const finalizarReserva = async () => {
+        if(!seleccion) return;
+        
+        if (!huesped.dni) {
+            Toast.fire({
+                icon: "warning",
+                title: "Por favor ingrese el DNI del huésped."
+            });
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            // 1. Verificar si el huésped existe
+            const checkRes = await fetch(`http://localhost:8081/huespedes/getByDni?dni=${huesped.dni}`);
+
+            if (checkRes.status === 404) {
+                setLoading(false);
+                
+                // MODAL BONITO PARA PREGUNTAR
+                const resultado = await Swal.fire({
+                    title: 'Huésped no encontrado',
+                    text: `El DNI ${huesped.dni} no figura en el sistema. ¿Desea registrarlo ahora?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, registrar',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (resultado.isConfirmed) {
+                    const estadoAGuardar = {
+                        seleccion: seleccion,
+                        dni: huesped.dni
+                    };
+                    localStorage.setItem("reservaPendiente", JSON.stringify(estadoAGuardar));
+                    router.push("/dashboard/huesped/altaHuesped?returnTo=reserva"); 
+                }
+                return; 
+            }
+
+            // --- CASO: HUÉSPED SÍ EXISTE ---
+            const payload = {
+                reserva: {
+                    cantHuesped: 1,
+                    fechaInicio: seleccion.fechaInicio,
+                    cantNoches: seleccion.cantNoches,
+                    descuento: false,
+                    estado: "Confirmada",
+                    idHuesped: parseInt(huesped.dni)
+                },
+                huesped: {
+                    dni: parseInt(huesped.dni),
+                    nombre: "",   
+                    apellido: "", 
+                    tipoDni: "DNI",
+                    direccion: null 
+                },
+                habitacion: {
+                    idHabitacion: seleccion.idHabitacion,
+                    idTipo: 1, 
+                    estado: "ocupada", 
+                    nochesDescuento: 0
+                }
+            };
+
+            const res = await fetch("http://localhost:8081/reservas/crear", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if(res.ok) {
+                // EXITO: TOAST VERDE
+                Toast.fire({
+                    icon: "success",
+                    title: "¡Reserva registrada con éxito!"
+                });
+                
+                localStorage.removeItem("reservaPendiente");
+                
+                setTimeout(() => {
+                    router.push("/dashboard/reservas");
+                }, 1500);
+
+            } else {
+                const txt = await res.text();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error al registrar",
+                    text: txt
+                });
+            }
+
+        } catch (e) {
+            console.error(e);
+            Toast.fire({
+                icon: "error",
+                title: "Error de conexión con el servidor."
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // --- RENDERIZADO ---
+    const getDias = () => Array.from(new Set(disponibilidad.map(c => c.fecha))).sort();
+    const getHabitaciones = () => Array.from(new Set(disponibilidad.map(c => c.idHabitacion))).sort((a,b) => a-b);
+
+    return (
+        <div className="p-6 max-w-6xl mx-auto font-sans text-gray-800">
+        
+        {/* HEADER PASOS */}
+        <div className="mb-8 flex justify-between items-center bg-gray-100 p-4 rounded-lg">
+            <div className={`font-bold ${paso === 1 ? 'text-blue-600' : 'text-gray-400'}`}>1. Selección</div>
+            <div className="text-gray-400">→</div>
+            <div className={`font-bold ${paso === 2 ? 'text-blue-600' : 'text-gray-400'}`}>2. Verificación</div>
+            <div className="text-gray-400">→</div>
+            <div className={`font-bold ${paso === 3 ? 'text-blue-600' : 'text-gray-400'}`}>3. Datos Huésped</div>
+        </div>
+
+        {/* --- VISTA 1: GRILLA DE DISPONIBILIDAD --- */}
+        {paso === 1 && (
+            <div className="bg-white shadow rounded-lg p-6 border">
+                <h2 className="text-xl font-bold mb-4">Buscar Disponibilidad</h2>
+                
+                <div className="flex gap-4 mb-6 items-end flex-wrap">
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700">Desde</label>
+                        <input type="date" className="border p-2 rounded" value={fechaDesde} onChange={e => setFechaDesde(e.target.value)} />
+                    </div>
+                    <div className="relative">
+                        <label className="block text-sm font-bold text-gray-700">Hasta</label>
+                        <input type="date" 
+                                className={`border p-2 rounded ${errorFechas ? 'border-red-500 bg-red-50' : ''}`} 
+                                value={fechaHasta} 
+                                onChange={e => setFechaHasta(e.target.value)} 
+                        />
+                        {errorFechas && (
+                            <p className="text-red-500 text-xs mt-1 absolute w-48">
+                                La fecha de fin debe ser mayor a la fecha de inicio
+                            </p>
+                        )}
+                    </div>
+                    
+                    <div className="min-w-[200px]">
+                        <label className="block text-sm font-bold text-gray-700">Tipo Habitación</label>
+                        <select className="border p-2 rounded w-full bg-white"
+                                value={tipoSeleccionado}
+                                onChange={(e) => setTipoSeleccionado(e.target.value)}>
+                            <option value="">Todas las habitaciones</option>
+                            {tiposHabitacion.map(tipo => (
+                                <option key={tipo.idTipo} value={tipo.idTipo}>
+                                    {tipo.nombreTipo}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <button
+                        onClick={buscarDisponibilidad} 
+                        className={`px-6 py-2 rounded font-bold text-white ${
+                            loading || errorFechas 
+                            ? 'bg-gray-400 cursor-not-allowed' 
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        }`}
+                        disabled={loading || !!errorFechas}
+                    >
+                        {loading ? "Cargando..." : "Buscar"}
+                    </button>
+                </div>
+
+                {/* TABLA */}
+                {disponibilidad.length > 0 && (
+                    <div className="overflow-auto border rounded">
+                        <table className="w-full text-center border-collapse">
+                            <thead className="bg-gray-200">
+                                <tr>
+                                    <th className="p-3 border sticky left-0 bg-gray-200">Habitación</th>
+                                    {getDias().map(dia => (
+                                        <th key={dia} className="p-3 border min-w-[100px]">{dia}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                             <tbody>
+                                {getHabitaciones().map(idHab => (
+                                    <tr key={idHab}>
+                                        <td className="p-3 border font-bold bg-gray-50">Hab {idHab}</td>
+                                        {getDias().map(dia => {
+                                            const celda = disponibilidad.find(c => c.idHabitacion === idHab && c.fecha === dia);
+                                            const estado = celda ? celda.estado : "DESCONOCIDO";
+                                            
+                                            let bgClass = "bg-green-200 hover:bg-green-300 "; 
+                                            if(estado === "OCUPADA") bgClass = "bg-red-300 ";
+                                            if(estado === "RESERVADA") bgClass = "bg-yellow-200 ";
+                                            
+                                            const isSelected = seleccion?.idHabitacion === idHab;
+
+                                            return (
+                                                <td 
+                                                    key={dia} 
+                                                    className={`p-3 border ${bgClass} ${isSelected ? 'ring-2 ring-blue-600' : ''}`}
+                                                    onClick={() => celda && seleccionarCelda(celda)}
+                                                >
+                                                    {estado === "LIBRE" ? "Libre" : "Ocupada"}
+                                                </td>
+                                            )
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                
+                
+            </div>
+        )}
+
+       
+
+        </div>
+    );
 }

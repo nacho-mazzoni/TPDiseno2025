@@ -11,6 +11,7 @@ import com.Diseno.TPDiseno2025.Domain.DireccionId;
 import com.Diseno.TPDiseno2025.Domain.Huesped;
 import com.Diseno.TPDiseno2025.Model.DireccionDTO;
 import com.Diseno.TPDiseno2025.Model.HuespedDTO;
+import com.Diseno.TPDiseno2025.Repository.DireccionRepository;
 import com.Diseno.TPDiseno2025.Repository.HuespedRepository;
 import com.Diseno.TPDiseno2025.Util.NotFoundException;
 
@@ -19,6 +20,9 @@ public class HuespedServiceImp implements HuespedService {
 
     @Autowired
     private DireccionService direccionService;
+    
+    @Autowired
+    private DireccionRepository direccionRepository;
 
     @Autowired
     private HuespedRepository huespedRepository;
@@ -32,6 +36,12 @@ public class HuespedServiceImp implements HuespedService {
     public Integer crearHuespedDTO(HuespedDTO hDTO){
         DireccionDTO dirDTO = hDTO.getDireccion();
         Direccion dir = new Direccion();
+        if(hDTO.getDireccion().getPiso() == null){
+            hDTO.getDireccion().setPiso(0);
+        }
+        if(hDTO.getDireccion().getDepartamento() == null){
+            hDTO.getDireccion().setDepartamento("-");
+        }
         if(direccionService.direccionExists(dirDTO.getCalle(), dirDTO.getNumero(), dirDTO.getDepartamento(), dirDTO.getPiso(),dirDTO.getCodPostal())){
             dir = direccionService.mapToEntDireccion(dirDTO);
         }else{
@@ -272,13 +282,26 @@ public class HuespedServiceImp implements HuespedService {
     }
 
     @Override
-    public void modificarHuespedDTO(String tipoDni, Integer dni, HuespedDTO hDTO){
-        if(huespedRepository.existsByDni(dni)){
-            huespedRepository.delete(huespedRepository.findByTipoDniAndDni(tipoDni, dni).get());
+    public void modificarHuespedDTO(String tipoDni, Integer dni, HuespedDTO hDTO) {
+        
+        Huesped huespedExistente = huespedRepository.findByTipoDniAndDni(tipoDni, dni).get();
+
+        Direccion nuevaDireccion = direccionService.mapToEntDireccion(hDTO.getDireccion());
+        if (!direccionService.direccionExists(
+                nuevaDireccion.getId().getCalle(),
+                nuevaDireccion.getId().getNumero(),
+                nuevaDireccion.getId().getDepartamento(),
+                nuevaDireccion.getId().getPiso(),
+                nuevaDireccion.getId().getCodPostal()
+            )) {
+            direccionService.crearDireccion(nuevaDireccion.getId(), hDTO.getDireccion());
+            nuevaDireccion = direccionRepository.findById(nuevaDireccion.getId()).get();
         }else{
-           // throws(new HuespedNotfoundException());
+            nuevaDireccion = direccionRepository.findById(nuevaDireccion.getId()).get();
         }
-        huespedRepository.save(this.mapToEntity(new Huesped(), hDTO));
+        
+        huespedExistente.setDireccion(nuevaDireccion);
+        huespedRepository.save(huespedExistente);
     }
 
     @Override

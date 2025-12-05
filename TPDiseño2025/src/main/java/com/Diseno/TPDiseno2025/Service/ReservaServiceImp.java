@@ -15,6 +15,7 @@ import com.Diseno.TPDiseno2025.Model.CeldaCalendarioDTO;
 import com.Diseno.TPDiseno2025.Model.HabitacionDTO;
 import com.Diseno.TPDiseno2025.Model.HuespedDTO;
 import com.Diseno.TPDiseno2025.Model.ReservaDTO;
+import com.Diseno.TPDiseno2025.Repository.EstadiaRepository;
 import com.Diseno.TPDiseno2025.Repository.ReservaRepository;
 
 
@@ -34,6 +35,9 @@ public class ReservaServiceImp implements ReservaService {
 
     @Autowired
     private ReservaRepository reservaRepository;
+
+    @Autowired
+    private EstadiaRepository estadiaRepository;
 
     @Override   
     public void crearReserva(ReservaDTO r, HuespedDTO h, HabitacionDTO habitacion) {
@@ -125,13 +129,13 @@ public class ReservaServiceImp implements ReservaService {
         LocalDate fechaInicio = LocalDate.parse(inicioStr);
         LocalDate fechaFin = LocalDate.parse(finStr);
 
-        // Traer todo lo necesario
+        // 1. Traer todo lo necesario
         List<Habitacion> todasLasHabitaciones = habitacionService.obtenerTodasPorTipo(idTipo);
         List<DetalleReserva> ocupaciones = detalleService.buscarReservasEnConflicto(fechaInicio, fechaFin);
         
         List<CeldaCalendarioDTO> grilla = new ArrayList<>();
 
-        // Recorrer día por día
+        // 2. Recorrer día por día
         for (LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1)) {
             
             final LocalDate fechaActual = fecha; 

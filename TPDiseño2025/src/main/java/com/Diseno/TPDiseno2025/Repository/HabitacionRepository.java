@@ -11,6 +11,5 @@ import com.Diseno.TPDiseno2025.Domain.TipoHabitacion;
 public interface HabitacionRepository extends JpaRepository<Habitacion, Integer>{
     @Override
     Optional<Habitacion> findById(Integer idHabitacion);
-
     List<Habitacion> findByIdTipo(TipoHabitacion idTipo);
 }

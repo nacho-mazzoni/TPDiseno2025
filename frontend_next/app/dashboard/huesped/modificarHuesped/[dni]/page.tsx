@@ -14,6 +14,7 @@ interface HuespedForm {
   telefono: string;
   ocupacion: string;
   posIva: string;
+  cuil: string; // Agregado
   nacionalidad: string;
   calle: string;
   numero: string;
@@ -28,21 +29,22 @@ interface HuespedForm {
 export default function ModificarHuespedPage({ params }: { params: Promise<{ dni: string }> }) {
   const router = useRouter();
   
-  
   const resolvedParams = use(params);
   const dniUrl = resolvedParams.dni; 
 
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
+  const [errores, setErrores] = useState<Record<string, string>>({}); // Estado para bordes rojos
   
   const [form, setForm] = useState<HuespedForm>({
     dni: "", tipoDni: "DNI", apellido: "", nombre: "", fechaNacimiento: "",
-    email: "", telefono: "", ocupacion: "", posIva: "Consumidor Final", nacionalidad: "",
+    email: "", telefono: "", ocupacion: "", posIva: "Consumidor Final", 
+    cuil: "", nacionalidad: "",
     calle: "", numero: "", departamento: "", piso: "", codPostal: "",
     localidad: "", provincia: "", pais: ""
   });
 
-  //CARGAR DATOS AL INICIAR
+  // --- 1. CARGAR DATOS AL INICIAR ---
   useEffect(() => {
     const cargarHuesped = async () => {
       try {
@@ -55,12 +57,15 @@ export default function ModificarHuespedPage({ params }: { params: Promise<{ dni
             tipoDni: data.tipoDni,
             apellido: data.apellido,
             nombre: data.nombre,
+            cuil: data.cuil || "", // Asumiendo que el backend trae CUIL
             fechaNacimiento: data.fechaNacimiento || "",
             email: data.email || "",
             telefono: data.telefono || "",
             ocupacion: data.ocupacion || "",
             posIva: data.posIva || "Consumidor Final",
             nacionalidad: data.nacionalidad || "",
+            
+            // Datos de Dirección
             calle: data.direccion?.calle || "",
             numero: data.direccion?.numero?.toString() || "",
             departamento: data.direccion?.departamento || "",
@@ -85,14 +90,128 @@ export default function ModificarHuespedPage({ params }: { params: Promise<{ dni
     if (dniUrl) cargarHuesped();
   }, [dniUrl, router]);
 
-  //MANEJAR CAMBIOS EN INPUTS
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  // --- 2. HELPERS DE VALIDACIÓN ---
+  const calcularEdad = (fechaNacimiento: string): number => {
+    if (!fechaNacimiento) return 0;
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const m = hoy.getMonth() - nacimiento.getMonth();
+    if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+    }
+    return edad;
   };
 
-  //GUARDAR CAMBIOS
+  const getInputClass = (fieldName: string) => {
+      return `w-full border p-2 rounded focus:ring-2 focus:ring-blue-400 outline-none ${errores[fieldName] ? 'border-red-500 bg-red-50' : ''}`;
+  };
+
+  // --- 3. MANEJO DE INPUTS (REGEX) ---
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    // Validaciones al escribir (bloqueo de teclas)
+    const camposSoloTexto = ["nombre", "apellido", "nacionalidad", "ocupacion", "pais", "provincia", "localidad"];
+    const camposSoloNum = ["dni", "cuil", "codPostal", "numero", "piso"]; 
+
+    // Solo letras
+    if (camposSoloTexto.includes(name)) {
+      if (!/^[a-zA-Z\u00C0-\u00FF\s]*$/.test(value)) return;
+    }
+
+    // Solo números
+    if(camposSoloNum.includes(name)){
+       if (!/^[0-9]*$/.test(value)) return;
+    }
+
+    // Teléfono especial
+    if (name === "telefono") {
+       if (!/^[0-9+\-\s]*$/.test(value)) return;
+    }
+
+    setForm({ ...form, [name]: value });
+
+    // Limpiar error visual al escribir
+    if (errores[name]) {
+        setErrores(prev => {
+            const newErrors = { ...prev };
+            delete newErrors[name];
+            return newErrors;
+        });
+    }
+  };
+
+  // --- 4. VALIDACIÓN GENERAL (POP-UP) ---
+  const validarFormulario = (): boolean => {
+    const nuevosErrores: Record<string, string> = {};
+    const mensajesPopup: string[] = [];
+
+    const registrarError = (campo: string, mensaje: string) => {
+        nuevosErrores[campo] = mensaje;
+        mensajesPopup.push(mensaje);
+    };
+
+    // Campos Obligatorios
+    if (!form.apellido) registrarError("apellido", "El apellido es obligatorio.");
+    if (!form.nombre) registrarError("nombre", "El nombre es obligatorio.");
+    if (!form.dni) registrarError("dni", "El DNI es obligatorio.");
+    // if (!form.cuil) registrarError("cuil", "El CUIL es obligatorio."); // Descomentar si es obligatorio en Modificación
+    if (!form.fechaNacimiento) registrarError("fechaNacimiento", "La fecha de nacimiento es obligatoria.");
+    if (!form.telefono) registrarError("telefono", "El teléfono es obligatorio.");
+    if (!form.nacionalidad) registrarError("nacionalidad", "La nacionalidad es obligatoria.");
+    if (!form.ocupacion) registrarError("ocupacion", "La ocupación es obligatoria.");
+
+    // Dirección
+    if (!form.calle) registrarError("calle", "La calle es obligatoria.");
+    if (!form.numero) registrarError("numero", "La altura (número) es obligatoria."); 
+    if (!form.localidad) registrarError("localidad", "La localidad es obligatoria.");
+    if (!form.codPostal) registrarError("codPostal", "El código postal es obligatorio.");
+
+    // Reglas Específicas
+    if (form.dni && form.dni.length !== 8) {
+        registrarError("dni", "El DNI debe tener exactamente 8 dígitos.");
+    }
+    if (form.cuil && form.cuil.length !== 11 && form.cuil.length > 0) { // Validar solo si escribió algo
+        registrarError("cuil", "El CUIL debe tener exactamente 11 dígitos.");
+    }
+    if (form.telefono) {
+        const soloNumerosTel = form.telefono.replace(/[^0-9]/g, "");
+        if (soloNumerosTel.length > 15) registrarError("telefono", "El teléfono no puede tener más de 15 números.");
+    }
+    if (form.fechaNacimiento) {
+        const edad = calcularEdad(form.fechaNacimiento);
+        if (edad < 1) registrarError("fechaNacimiento", "La edad del huésped no es válida.");
+    }
+
+    setErrores(nuevosErrores);
+
+    if (mensajesPopup.length > 0) {
+        const listaHtml = `
+            <ul style="text-align: left; font-size: 0.9em; list-style-type: none; padding: 0; margin: 0;">
+                ${mensajesPopup.map(msg => `<li style="margin-bottom: 6px; padding-left: 10px; border-left: 3px solid #d33;">${msg}</li>`).join('')}
+            </ul>
+        `;
+
+        Swal.fire({
+            title: 'Datos Incompletos o Inválidos',
+            icon: 'warning',
+            html: listaHtml,
+            confirmButtonText: 'Revisar',
+            confirmButtonColor: '#3085d6'
+        });
+        return false;
+    }
+    return true;
+  };
+
+  // --- 5. GUARDAR CAMBIOS ---
   const handleGuardar = async () => {
+    // Primero validamos
+    if (!validarFormulario()) return;
+
     setGuardando(true);
+    const edadCalculada = calcularEdad(form.fechaNacimiento);
     
     const payload = {
         nombre: form.nombre,
@@ -100,10 +219,12 @@ export default function ModificarHuespedPage({ params }: { params: Promise<{ dni
         tipoDni: form.tipoDni,
         dni: parseInt(form.dni),
         fechaNacimiento: form.fechaNacimiento,
+        edad: edadCalculada, // Importante mandar la edad recalculada
         email: form.email,
         telefono: form.telefono,
         ocupacion: form.ocupacion,
         posIva: form.posIva,
+        nacionalidad: form.nacionalidad,
         direccion: {
             calle: form.calle,
             numero: parseInt(form.numero) || 0,
@@ -124,7 +245,12 @@ export default function ModificarHuespedPage({ params }: { params: Promise<{ dni
         });
 
         if (res.ok) {
-            await Swal.fire("¡Éxito!", "Huésped modificado correctamente", "success");
+            await Swal.fire({
+                title: "¡Éxito!", 
+                text: "Huésped modificado correctamente", 
+                icon: "success",
+                timer: 2000
+            });
             router.push("/dashboard/huesped");
         } else {
             const txt = await res.text();
@@ -137,82 +263,137 @@ export default function ModificarHuespedPage({ params }: { params: Promise<{ dni
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Cargando datos del huésped...</div>;
+  if (loading) return <div className="p-8 text-center text-gray-600 font-bold">Cargando datos del huésped...</div>;
 
   return (
-    <div className="p-8 max-w-5xl mx-auto bg-gray-50 min-h-screen">
+    <div className="p-8 max-w-5xl mx-auto bg-gray-50 min-h-screen font-sans text-gray-800">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Modificar Huésped</h1>
 
-      <div className="bg-white p-6 rounded shadow border">
-        {/* DATOS PERSONALES */}
+      <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+        
+        {/* --- DATOS PERSONALES --- */}
+        <h3 className="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Datos Personales</h3>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* DNI y Tipo (Deshabilitados para edición, pero visibles) */}
+            <div className="bg-gray-100 p-3 rounded border border-gray-300">
+                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Documento (No editable)</label>
+                <div className="flex gap-2">
+                    <span className="font-mono text-lg font-bold text-gray-700">{form.tipoDni}</span>
+                    <span className="font-mono text-lg font-bold text-gray-800">{form.dni}</span>
+                </div>
+            </div>
+
+            {/* Fecha Nacimiento */}
             <div>
-                <label className="font-bold block mb-1">DNI (No editable)</label>
-                <input value={form.dni} disabled className="w-full border p-2 rounded bg-gray-200 cursor-not-allowed" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Fecha Nacimiento <span className="text-red-500">(*)</span></label>
+                <input type="date" name="fechaNacimiento" value={form.fechaNacimiento} onChange={handleChange} className={getInputClass("fechaNacimiento")} />
+            </div>
+
+            {/* Nombre y Apellido */}
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Nombre <span className="text-red-500">(*)</span></label>
+                <input name="nombre" value={form.nombre} onChange={handleChange} className={getInputClass("nombre")} />
             </div>
             <div>
-                <label className="font-bold block mb-1">Tipo Doc</label>
-                <input value={form.tipoDni} disabled className="w-full border p-2 rounded bg-gray-200 cursor-not-allowed" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Apellido <span className="text-red-500">(*)</span></label>
+                <input name="apellido" value={form.apellido} onChange={handleChange} className={getInputClass("apellido")} />
+            </div>
+
+            {/* CUIL y Teléfono */}
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">CUIL</label>
+                <input name="cuil" maxLength={11} value={form.cuil} onChange={handleChange} className={getInputClass("cuil")} placeholder="11 dígitos" />
             </div>
             <div>
-                <label className="font-bold block mb-1">Nombre</label>
-                <input name="nombre" value={form.nombre} onChange={handleChange} className="w-full border p-2 rounded" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Teléfono <span className="text-red-500">(*)</span></label>
+                <input name="telefono" maxLength={20} value={form.telefono} onChange={handleChange} className={getInputClass("telefono")} />
+            </div>
+
+            {/* Email y Nacionalidad */}
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
+                <input name="email" value={form.email} onChange={handleChange} className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
             </div>
             <div>
-                <label className="font-bold block mb-1">Apellido</label>
-                <input name="apellido" value={form.apellido} onChange={handleChange} className="w-full border p-2 rounded" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Nacionalidad <span className="text-red-500">(*)</span></label>
+                <input name="nacionalidad" value={form.nacionalidad} onChange={handleChange} className={getInputClass("nacionalidad")} />
+            </div>
+
+            {/* Ocupación y Posición IVA */}
+            <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Ocupación <span className="text-red-500">(*)</span></label>
+                <input name="ocupacion" value={form.ocupacion} onChange={handleChange} className={getInputClass("ocupacion")} />
             </div>
             <div>
-                <label className="font-bold block mb-1">Fecha Nacimiento</label>
-                <input type="date" name="fechaNacimiento" value={form.fechaNacimiento} onChange={handleChange} className="w-full border p-2 rounded" />
-            </div>
-            <div>
-                <label className="font-bold block mb-1">Teléfono</label>
-                <input name="telefono" value={form.telefono} onChange={handleChange} className="w-full border p-2 rounded" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Posición Frente al IVA</label>
+                <select name="posIva" value={form.posIva} onChange={handleChange} className="w-full border p-2 rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option>Consumidor Final</option>
+                    <option>Responsable Inscripto</option>
+                    <option>Monotributista</option>
+                    <option>Exento</option>
+                </select>
             </div>
         </div>
 
-        {/* DIRECCIÓN */}
-        <h3 className="font-bold text-lg mb-4 border-b pb-2 text-blue-700">Dirección</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-600">Calle</label>
-                <input name="calle" value={form.calle} onChange={handleChange} className="w-full border p-2 rounded" />
+        {/* --- DIRECCIÓN (DISEÑO LIMPIO) --- */}
+        <div className={`bg-white p-4 border rounded shadow-sm mt-8 ${errores.calle || errores.numero || errores.codPostal || errores.localidad ? 'border-red-300' : 'border-gray-300'}`}>
+            <label className="block text-sm font-bold text-blue-800 mb-2 border-b pb-1">Dirección <span className="text-red-500">(*)</span></label>
+            
+            <div className="mb-2">
+                <input name="calle" value={form.calle} onChange={handleChange} placeholder="Calle (*)" className={getInputClass("calle")} />
             </div>
-            <div>
-                <label className="block text-sm font-bold text-gray-600">Número</label>
-                <input name="numero" value={form.numero} onChange={handleChange} className="w-full border p-2 rounded" />
+            
+            <div className="flex gap-2 mb-2">
+                <div className="w-1/3">
+                    <input name="numero" value={form.numero} onChange={handleChange} placeholder="Núm (*)" className={getInputClass("numero")} />
+                </div>
+                <div className="w-1/3">
+                    <input name="piso" value={form.piso} onChange={handleChange} placeholder="Piso" className={getInputClass("piso")} />
+                </div>
+                <div className="w-1/3">
+                    <input name="departamento" value={form.departamento} onChange={handleChange} placeholder="Depto" className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
             </div>
-            <div>
-                <label className="block text-sm font-bold text-gray-600">Localidad</label>
-                <input name="localidad" value={form.localidad} onChange={handleChange} className="w-full border p-2 rounded" />
+
+            <div className="flex gap-2 mb-4">
+                <div className="w-1/3">
+                    <input name="codPostal" value={form.codPostal} onChange={handleChange} placeholder="CP (*)" className={getInputClass("codPostal")} />
+                </div>
+                <div className="w-2/3">
+                    <input name="localidad" value={form.localidad} onChange={handleChange} placeholder="Ciudad/Localidad (*)" className={getInputClass("localidad")} />
+                </div>
             </div>
-            <div>
-                <label className="block text-sm font-bold text-gray-600">Provincia</label>
-                <input name="provincia" value={form.provincia} onChange={handleChange} className="w-full border p-2 rounded" />
-            </div>
-            <div>
-                <label className="block text-sm font-bold text-gray-600">País</label>
-                <input name="pais" value={form.pais} onChange={handleChange} className="w-full border p-2 rounded" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                    <label className="text-xs font-bold text-gray-500 ml-1">Provincia</label>
+                    <input name="provincia" value={form.provincia} onChange={handleChange} className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+                <div>
+                    <label className="text-xs font-bold text-gray-500 ml-1">País</label>
+                    <input name="pais" value={form.pais} onChange={handleChange} className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
             </div>
         </div>
 
-        {/* BOTONES */}
-        <div className="flex justify-between pt-4 border-t">
+        {/* --- BOTONES DE ACCIÓN --- */}
+        <div className="flex justify-between pt-8 mt-6 border-t border-gray-200">
             <button 
                 onClick={() => router.back()} 
-                className="bg-gray-300 px-6 py-2 rounded font-bold hover:bg-gray-400"
+                className="px-6 py-2.5 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 transition"
             >
                 Cancelar
             </button>
             <button 
                 onClick={handleGuardar} 
                 disabled={guardando}
-                className="bg-blue-600 text-white px-8 py-2 rounded font-bold hover:bg-blue-700 shadow"
+                className="px-8 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md transition transform active:scale-95 disabled:opacity-50"
             >
                 {guardando ? "Guardando..." : "Guardar Cambios"}
             </button>
         </div>
+
       </div>
     </div>
   );
