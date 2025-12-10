@@ -179,6 +179,10 @@ public class ReservaServiceImp implements ReservaService {
         }
         return grilla;
     }
+
+    public Reserva guardarReserva(Reserva r){
+        return reservaRepository.save(r);
+    }
     
 
 }
