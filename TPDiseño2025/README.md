@@ -2,7 +2,7 @@
 tp diseño de sistemas 2025 utn frsf
 
 Pasos para correr el progama:
-1. Abrir la carpeta TPDiseño2025, dentro de ella ejecitar el comando docker compose up -d
+1. Abrir la carpeta TPDiseño2025, dentro de ella ejecutar el comando docker compose up -d
 2. Abrir la carpeta frontend_next, dentro de TPDiseno2025 y ejecutar el comando npm run dev
 3. Luego en Spring Boot DashBoard ejecutar el archico TpDiseno2025Application.java o en la carpeta TPDiseño2025 ejecutar el comando mvn springboot:run
 
