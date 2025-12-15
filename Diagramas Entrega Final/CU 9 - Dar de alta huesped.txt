@@ -1,0 +1,213 @@
+@startuml
+title Diagrama_Secuencia_CU09
+actor Conserje
+participant UI_DarDeAltaHuesped
+participant GestorHuesped
+participant HuespedDAO
+participant DireccionDAO
+participant TelefonoDAO
+loop Mientras: usuario quiera cargar mas datos
+Conserje -> UI_DarDeAltaHuesped : Solicitar alta de  huesped
+activate UI_DarDeAltaHuesped
+
+UI_DarDeAltaHuesped -> Conserje : Mostrar pantalla vacia para ingresar datos
+loop Mientras: campos incompletos, erroneos o usuario desee coregir
+
+  Conserje -> UI_DarDeAltaHuesped : Completar campos con datos de huesped 
+  UI_DarDeAltaHuesped -> UI_DarDeAltaHuesped : verificar datos obligatiorios completados
+  
+  opt datos incompletos
+    UI_DarDeAltaHuesped -> Conserje: mostrarMensaje("Error, debe completar todos los campos obligatorios")
+  end
+end
+
+UI_DarDeAltaHuesped -> GestorHuesped : f: verificarExistenciaHuesped(HuespedDTO) 
+deactivate UI_DarDeAltaHuesped
+activate GestorHuesped
+
+GestorHuesped -> HuespedDAO : f: verificarExistenciaHuesped(HuespedDTO)
+deactivate GestorHuesped
+activate HuespedDAO
+
+opt huesped existente
+  HuespedDAO --> GestorHuesped
+  deactivate HuespedDAO
+  activate GestorHuesped
+  GestorHuesped -> UI_DarDeAltaHuesped : el huesped que desea cargar ya existe 
+  deactivate GestorHuesped
+  activate UI_DarDeAltaHuesped
+  UI_DarDeAltaHuesped -> Conserje : mostrarMensaje("¡CUIDADO! El tipo y número de documento ya existen en el sistema") y mostrar opciones de seleccion
+  UI_DarDeAltaHuesped -> Conserje: mostrar botones
+  alt presiona "Aceptar Igualmente"
+    Conserje -> UI_DarDeAltaHuesped: presiona Aceptar Igualmente
+    UI_DarDeAltaHuesped -> GestorHuesped: modificarHuesped()
+    activate GestorHuesped
+    create DireccionInst
+    GestorHuesped --> DireccionInst : <<create>>
+    activate DireccionInst
+    GestorHuesped -> DireccionInst : setNum(HuespedDTO.num)
+    GestorHuesped -> DireccionInst : setCalle(HuespedDTO.calle)
+    GestorHuesped -> DireccionInst : setDpto(HuespedDTO.departamento)
+    GestorHuesped -> DireccionInst : setPiso(HuespedDTO.piso)
+    GestorHuesped -> DireccionInst : setCP(HuespedDTO.codigoPostal)
+    GestorHuesped -> DireccionInst : setLocalidad(HuespedDTO.localidad)
+    GestorHuesped -> DireccionInst : setProvincia(HuespedDTO.provincia)
+    GestorHuesped -> DireccionInst : setPais(HuespedDTO.pais)
+    deactivate DireccionInst
+    GestorHuesped -> DireccionDAO: registrarDireccion(DireccionInst)
+    activate DireccionDAO
+    opt reserva no se registra correctamente
+      DireccionDAO -> GestorHuesped: retornarError("Mensaje error")
+      GestorHuesped -> UI_DarDeAltaHuesped: retornarError("Mensaje error")
+      UI_DarDeAltaHuesped -> Conserje: mostrarMensaje("Mensaje error")
+    end
+    DireccionDAO -> GestorHuesped: direccion Registrada
+    deactivate DireccionDAO
+  
+    create HuespedInst
+    GestorHuesped --> HuespedInst : <<create>>
+    activate HuespedInst
+    GestorHuesped -> HuespedInst : setDireccion(DireccionInst)
+    GestorHuesped -> HuespedInst: setNombre(HuespedDTO.nombre)
+    GestorHuesped -> HuespedInst: setApellido(HuespedDTO.apellido)
+    GestorHuesped -> HuespedInst: setEdad(HuespedDTO.edad)
+    GestorHuesped -> HuespedInst: setTelefono(HuespedDTO.telefono)
+    GestorHuesped -> HuespedInst: setMail(HuespedDTO.mail)
+    GestorHuesped -> HuespedInst: setPosicionIVA(HuespedDTO.posicionIva)
+    GestorHuesped -> HuespedInst: setOcupacion(HuespedDTO.ocupacion)
+    GestorHuesped -> HuespedInst: setNacionalidad(HuespedDTO.nacionalidad)
+    deactivate HuespedInst
+    GestorHuesped -> HuespedDAO: validarHuesped(HuespedInst)
+    activate HuespedDAO
+    opt error de validacion
+      HuespedDAO -> GestorHuesped: retornarError("Mensaje error")
+      GestorHuesped -> UI_DarDeAltaHuesped: retornarError("Mensaje error")
+      UI_DarDeAltaHuesped -> Conserje: mostrarMensaje("Mensaje error")
+    end
+    HuespedDAO -> GestorHuesped: huesped Registrado
+    deactivate HuespedDAO
+    
+    create TelefonoInst
+  GestorHuesped -> TelefonoInst : <<create>>
+  activate TelefonoInst
+  GestorHuesped -> TelefonoInst : setHuesped(HuespedInst)
+  GestorHuesped -> TelefonoInst : setTelefono(TelefonoDTO.telefono)
+  deactivate TelefonoInst
+
+  GestorHuesped -> TelefonoDAO : validarTelefono(TelefonoInst)
+  activate TelefonoDAO
+  opt error de validacion
+  TelefonoDAO -> GestorHuesped: retornarError("Mensaje error")
+  GestorHuesped -> UI_DarDeAltaHuesped: retornarError("Mensaje error")
+  UI_DarDeAltaHuesped -> Conserje: mostrarMensaje("Mensaje error")
+  end
+  TelefonoDAO -> GestorHuesped: Telefono Registrado
+   deactivate TelefonoDAO
+    
+    GestorHuesped -> UI_DarDeAltaHuesped
+    deactivate GestorHuesped
+    UI_DarDeAltaHuesped -> Conserje: pasar a dar Alta Huesped
+  else presion "Corregir"
+    Conserje -> UI_DarDeAltaHuesped: presiona Corregir
+    UI_DarDeAltaHuesped -> Conserje: volver a la pantalla de campos haciendo foco en el campo "Tipo Documento"
+  end
+end
+
+opt presiona boton cancelar
+    Conserje -> UI_DarDeAltaHuesped: presiona cancelar
+    UI_DarDeAltaHuesped -> Conserje: el sistema muestra dos botones "Si / No"
+    alt presiona Si
+      Conserje -> UI_DarDeAltaHuesped: presiona cancelar
+      UI_DarDeAltaHuesped -> Conserje: finaliza CU
+    else presiona No
+      Conserje -> UI_DarDeAltaHuesped: presiona No
+      UI_DarDeAltaHuesped -> Conserje: volver a la pantalla con los campos ya ingresados previamente
+    end
+end
+
+  activate UI_DarDeAltaHuesped
+  UI_DarDeAltaHuesped -> GestorHuesped : darAltaHuesped()
+  
+  activate GestorHuesped
+  create DireccionInst
+  GestorHuesped --> DireccionInst : <<create>>
+  activate DireccionInst
+  GestorHuesped -> DireccionInst : setNum(HuespedDTO.num)
+  GestorHuesped -> DireccionInst : setCalle(HuespedDTO.calle)
+  GestorHuesped -> DireccionInst : setDpto(HuespedDTO.departamento)
+  GestorHuesped -> DireccionInst : setPiso(HuespedDTO.piso)
+  GestorHuesped -> DireccionInst : setCP(HuespedDTO.codigoPostal)
+  GestorHuesped -> DireccionInst : setLocalidad(HuespedDTO.localidad)
+  GestorHuesped -> DireccionInst : setProvincia(HuespedDTO.provincia)
+  GestorHuesped -> DireccionInst : setPais(HuespedDTO.pais)
+  deactivate DireccionInst
+  GestorHuesped ->> DireccionDAO: registrarDireccion(DireccionInst)
+  activate DireccionDAO
+  opt reserva no se registra correctamente
+  DireccionDAO -> GestorHuesped: retornarError("Mensaje error")
+  GestorHuesped -> UI_DarDeAltaHuesped: retornarError("Mensaje error")
+  
+ 
+  UI_DarDeAltaHuesped -> Conserje: mostrarMensaje("Mensaje error")
+ 
+  end
+  DireccionDAO -> GestorHuesped: direccion Registrada
+  deactivate DireccionDAO
+ 
+ 
+  
+  create HuespedInst
+  GestorHuesped --> HuespedInst : <<create>>
+  activate HuespedInst
+  GestorHuesped -> HuespedInst : setDireccion(DireccionInst)
+  GestorHuesped -> HuespedInst: setNombre(HuespedDTO.nombre)
+  GestorHuesped -> HuespedInst: setApellido(HuespedDTO.apellido)
+  GestorHuesped -> HuespedInst: setEdad(HuespedDTO.edad)
+  GestorHuesped -> HuespedInst: setTipoDoc(HuespedDTO.tipoDoc)
+  GestorHuesped -> HuespedInst: setNroDoc(HuespedDTO.nroDoc)
+  GestorHuesped -> HuespedInst: setTelefono(HuespedDTO.telefono)
+  GestorHuesped -> HuespedInst: setMail(HuespedDTO.mail)
+  GestorHuesped -> HuespedInst: setPosicionIVA(HuespedDTO.posicionIva)
+  GestorHuesped -> HuespedInst: setOcupacion(HuespedDTO.ocupacion)
+  GestorHuesped -> HuespedInst: setNacionalidad(HuespedDTO.nacionalidad)
+  deactivate HuespedInst
+  
+  GestorHuesped -> HuespedDAO: validarHuesped(HuespedInst)
+  activate HuespedDAO
+  opt error de validacion
+  HuespedDAO -> GestorHuesped: retornarError("Mensaje error")
+  GestorHuesped -> UI_DarDeAltaHuesped: retornarError("Mensaje error")
+  UI_DarDeAltaHuesped -> Conserje: mostrarMensaje("Mensaje error")
+  end
+  HuespedDAO -> GestorHuesped: huesped Registrado
+  deactivate HuespedDAO
+  
+  create TelefonoInst
+  GestorHuesped -> TelefonoInst : <<create>>
+  activate TelefonoInst
+  GestorHuesped -> TelefonoInst : setHuesped(HuespedInst)
+  GestorHuesped -> TelefonoInst : setTelefono(TelefonoDTO.telefono)
+  deactivate TelefonoInst
+
+  GestorHuesped -> TelefonoDAO : validarTelefono(TelefonoInst)
+  activate TelefonoDAO
+  opt error de validacion
+  TelefonoDAO -> GestorHuesped: retornarError("Mensaje error")
+  GestorHuesped -> UI_DarDeAltaHuesped: retornarError("Mensaje error")
+  UI_DarDeAltaHuesped -> Conserje: mostrarMensaje("Mensaje error")
+  end
+  TelefonoDAO -> GestorHuesped: Telefono Registrado
+   deactivate TelefonoDAO
+  
+  GestorHuesped -> UI_DarDeAltaHuesped
+  deactivate GestorHuesped
+  
+  UI_DarDeAltaHuesped -> Conserje : mostrarMensaje("El huesped 'nn/aa' ha sido satisfactoriamente cargado al sistema. ¿Desea cargar otro?")
+  opt Cargar mas datos
+    Conserje -> UI_DarDeAltaHuesped : si
+    UI_DarDeAltaHuesped -> Conserje : volver a pantalla de carga
+  end
+  Conserje -> UI_DarDeAltaHuesped : no
+  deactivate UI_DarDeAltaHuesped
+  end
+ @enduml

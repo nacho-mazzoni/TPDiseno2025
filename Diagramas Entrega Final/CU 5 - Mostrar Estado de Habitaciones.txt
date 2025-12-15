@@ -1,0 +1,88 @@
+﻿@startuml
+
+
+title Diagrama_Secuencia_CU05
+
+
+actor Conserje
+participant Interfaz
+participant GestorHabitacion
+participant HabitacionDAO
+participant Habitacion 
+activate Interfaz
+Conserje -> Interfaz : Solicita verificar el estado de las habitaciones
+Interfaz -> Conserje : Muestra pantalla para ingresar los campos (Desde fecha, Hasta fecha)
+deactivate Interfaz
+
+
+loop La fecha sea invalida
+
+
+opt  Usuario presiona cancelar
+
+
+Conserje -> Interfaz : Cancelar
+activate Interfaz
+Interfaz -> Conserje : Regresa a la pantalla principal
+deactivate Interfaz
+end
+
+
+Conserje -> Interfaz : Ingresa datos "Desde fecha"
+activate Interfaz
+Interfaz -> Interfaz: validarFormatoFecha()
+opt Fecha invalida
+
+
+  Interfaz -> Conserje : Muestra cartel indicando el motivo del error
+
+
+
+
+end
+
+
+Conserje -> Interfaz : Ingresa datos "Hasta fecha"
+Interfaz -> Interfaz: validarFormatoFecha()
+opt Fecha invalida
+
+
+  Interfaz -> Conserje : Muestra cartel indicando el motivo del error
+
+
+end
+end
+ 
+ Interfaz -> GestorHabitacion : f: BuscarEstadoHabitaciones(Desde fecha, Hasta fecha)
+ deactivate Interfaz
+
+
+ activate GestorHabitacion
+ GestorHabitacion -> HabitacionDAO : f: BuscarEstadoHabitaciones(Desde fecha, Hasta fecha)
+ activate HabitacionDAO
+ HabitacionDAO --> GestorHabitacion : listaEstadosHabitaciones
+ deactivate HabitacionDAO
+ 
+ 
+ loop Cada Habitacion
+ 
+ 
+
+
+ GestorHabitacion -> Habitacion : getEstado(DTO.EstadoHabitacion)
+  activate Habitacion
+ Habitacion --> GestorHabitacion
+  deactivate Habitacion
+ end
+
+
+ GestorHabitacion -> Interfaz : agregar habitacion con estado a la grilla
+ activate Interfaz
+ deactivate GestorHabitacion
+Interfaz -> Conserje: mostrar grilla de reservas actualizada
+deactivate Interfaz
+
+
+
+
+@enduml

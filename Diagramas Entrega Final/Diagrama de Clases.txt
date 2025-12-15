@@ -1,0 +1,706 @@
+@startuml
+
+title Diagrama de clases 24/11
+
+skinparam linetype ortho
+
+class Reserva{
+  +nombre: string
+  +apellido: string
+  +telefono: int
+  +cantHuesped: integer
+  +fechaInicio: Fecha
+  +cantNoches: integer
+  +habitacion: Habitacion
+  +descuento: boolean
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class Huesped{
+  +nombre: string
+  +apellido: string
+  +edad: integer
+  +tipoDoc: string
+  +nroDoc: integer
+  +mail: string
+  +fechaNac: fechaNac
+  +posicionIVA: string
+  +ocupacion: string
+  +nacionalidad: string
+  +direccion: Direccion
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class Habitacion{
+  +clase: TipoHabitacion
+  +nroHabitacion: integer
+  +cantNochesDesc: integer
+  +estado: EstadoHabitacion
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class Estadia{
+  +consumos: List<Consumible>
+  +precioEstadia: double
+  +reservaAsociada: Reserva
+  +factura: list<Factura>
+  +hora_CheckIn: double
+  +hora_CheckOut: double
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class Factura{
+  +nroFactura: int
+  +responsablePago: ResponsablePago 
+  +consumos: List<Consumible>
+  +precioFinal: double
+  +pago: list<Pago> 
+  +constructor()
+  +getters()
+  +setters()
+}
+
+abstract ResponsablePago{
+  +idResponsablePago: integer
+}
+
+class Juridica{
+  + razonSocial: string
+  + cuit: int
+  + direccion: Direccion
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class Direccion{
+  + id: DireccionId
+  + localidad: string
+  + provincia: string
+  + pais: string
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class TipoHabitacion{
+  +idTipo: int
+  +nombreTipo: string
+  +precioNoche: double
+  +cantidadDisponible: int
+  +getters()
+  +setters()
+}
+
+class Telefono{
+  + id_telefono: Integer
+  + telefono: string
+}
+
+
+
+class Consumible{
+  + tipoConsumible : string
+  + costoConsumible: int
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class Pago{
+  +monto: double
+  +Metodo: MedioDePago
+  +fecha: Fecha
+  +getters()
+  +setters()
+}
+
+abstract class MedioDePago{
+  +getters()
+  +setters()
+}
+
+class Efectivo{
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class MonedaExtranjera{
+  +tipoMoneda: string
+  +valorCambio: double
+  constructor()
+  getters()
+  setters()
+}
+
+class Cheque{
+  + nroCheque: int
+  + bancoEmisor: string
+  + titularCheque: string
+  constructor()
+  getters()
+  setters()
+}
+
+class Debito{
+  + nombreTitular: string
+  + apellidoTitular: string
+  + nroTarjeta: int
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class Credito{
+  + nombreTitular: string
+  + apellidoTitular: string
+  + nroTarjeta: int
+  + cuotas: int
+  +constructor()
+  +getters()
+  +setters()
+}
+
+class NotaCredito{
+  +facturaCancelada: list<Factura>
+  +constructor()
+  +getters()
+  +setters()
+}
+
+enum EstadoHabitacion{
+  + reserva
+  + ocupada
+  + libre
+  + fuera_servico
+}
+
+
+
+
+class GestorEstadia{
+  crearEstadia(): Estadia
+  listarConsumos(): List<Consumible>
+  agregarConsumo(): void
+  facturarEstadia(): void
+  buscarEstadia(): Estadia
+}
+
+class GestorFactura{
+  crearFactura(): Factura
+  listarConsumos(): List<Consumible>
+  imprimir(): void
+  ingresarNotadeCredito(): void
+  cancelarFactura(): void
+  agregarMetodoPago(): void
+}
+
+class GestorHuesped{
+  crearHuesped():Huesped
+  reservarHabitacion(): bool
+  cancelarReserva(): bool
+  buscarHuesped() : Huesped
+  darAltaHuesped() : void
+  darBajaHuesped(): void
+  modificarHuesped(): void
+  asignarFactura_Tercero(): void
+}
+
+class GestorJuridica{
+  crearPJuridica():Juridica
+  buscarPJuridica() : Juridica
+  modificarPJuridica(): void
+  buscarFacturasANombre():void
+}
+
+class GestorResponsablePago{
+  crearResponsablePago(): ResponsablePago
+  darAltaResponsablePago(): void
+  darBajaResponsablePago(): void
+  modificarResponsabePago(): void
+  buscarResponsablePago(): ResponsablePago
+  crearDireccion(): Direccion
+  modificarDireccion(): void
+  eliminarDireccion(): void
+  buscarDireccion(): Direccion
+}
+
+class GestorHabitacion{
+  crearHabitacion(): Habitacion
+  reservarH(): bool
+  ocuparHabitacion(): bool
+  estadoHab(): EstadoHabitacion
+  buscarHabitacion(): Habitacion
+  filtrarLibres(): List<Habitacion>
+  liberarHabitacion(): void
+  cambiarEstado(): void
+}
+
+class GestorReserva{
+  crearReserva(): Reserva
+  asignarHabitacion(): void
+  buscarAcompanantes(): void  
+  cancelarReserva():void
+}
+
+class GestorPago{
+  generarPago(): void
+  ingresarPago(): void
+  listarCheques(): List<Cheque>
+  listarIngresos(): Efectivo
+}
+
+class GestorTipoHabitacion{
+  crearTipoHabitacion(): TipoHabitacionDTO
+  listarTiposDeHabitacio(): void
+}
+
+class GestorMedioPago{
+  crearMedioDePago(): MedioDePagoDTO
+  eliminarMediodePago(): void
+  modificarMediodePago(): void
+}
+
+class GestorTelefono {
+  crearTelefono(): void
+  crearTelefonoDTO(): Telefono
+}
+
+class HabitacionDTO{
+  +clase: TipoHabitacionDTO
+  +nroHabitacion: integer
+  +cantNochesDesc: integer
+  +estado: EstadoHabitacion
+}
+
+class ReservaDTO{
+  +duenoReseva: Huesped
+  +cantHuesped: integer
+  +fechaInicio: Fecha
+  +cantNoches: integer
+  +habitacion: HabitacionDTO
+  +descuento: boolean
+}
+
+class HuespedDTO{
+  +nombre: string
+  +apellido: string
+  +edad: integer
+  +tipoDoc: string
+  +nroDoc: integer
+  +telefono: integer
+  +mail: string
+  +fechaNac: fechaNac
+  +posicionIVA: string
+  +ocupacion: string
+  +nacionalidad: string
+  +direccion: DireccionDTO
+}
+
+class JuridicaDTO {
+  + razonSocial: string
+  + cuit: int
+  + direccion: DireccionDTO
+}
+
+class ResponsablePagoDTO {
+  + razonSocial: string
+  + cuit: int
+  + direccion: DireccionDTO
+  + telefono: int
+}
+
+class FacturaDTO {
+  +nroFactura: int
+  +responsablePago: ResponsablePagoDTO
+  +consumos: List<Consumible>
+  +precioFinal: double
+  +pago: list<PagoDTO>
+}
+
+class EstadiaDTO{
+  +consumos: List<Consumible>
+  +precioEstadia: double
+  +reservaAsociada: ReservaDTO
+  +factura: list<FacturaDTO>
+  +hora_CheckIn: double
+  +hora_CheckOut: double
+}
+class TelefonoDTO {
+  +telefono:string
+  +huesped: Integer
+}
+class NotaCreditoDTO{
+  +facturaCancelada: list <FacturaDTO>
+}
+
+class DireccionDTO{
+  + num: int
+  + calle: string
+  + departamento: string
+  + piso: int
+  + codigoPostal: int
+  + localidad: string
+  + provincia: string
+  + pais: string
+}
+
+class PagoDTO{
+  +monto: double
+  +Metodo: MedioDePagoDTO
+  +fecha: Fecha
+}
+
+class TipoHabitacionDTO{
+  +cantidad: int
+}
+
+class CreditoDTO{
+  + nombreTitular: string
+  + apellidoTitular: string
+  + nroTarjeta: int
+  + cuotas: int
+}
+
+class MonedaExtranjeraDTO{
+  +tipoMoneda: strin
+}
+
+class DebitoDTO{
+  +nombreTitular: string
+  +apellidoTitular: string
+  + nroTarjeta: int
+}
+
+class ChequeDTO{
+  + nombreTitular: string
+  + apellidoTitular: string
+  + fechaCobro: Fecha
+  + nroCheque: int
+  + banco: string
+  + plaza: string
+}
+
+class CeldaCalendarioDTO {
+  +fecha: string
+  +idHabitacion: int
+  +estado: string
+  +idReserva: int
+}
+
+class OcupacionRequestDTO {
+  +habitaciones: List<HabitacionDTO>;
+  +huespedes: List<HuespedDTO>;
+  +fechaInicio: LocalDate;
+  +fechaFin: LocalDate;
+  +idReservaPrevia: int;
+}
+
+class HabitacionDAO{
+  crearHabitacion()
+  modificarHabitacion()
+  eliminarHabitacion()
+  obtenerHabitacion(fechaInicio: Fecha)
+}
+
+class ReservaDAO{
+  crearReserva()
+  modificarReserva()
+  eliminarReserva()
+  obtenerReserva(apellido: string, nombre: string)
+}
+
+class HuespedDAO{
+  crearHuesped()
+  modificarHuesped()
+  eliminarHuesped()
+  obtenerHuesped(tipoDoc: string, nroDoc: integer)
+}
+
+class JuridicaDAO{
+  crearJuridica()
+  modificarJuridica()
+  eliminarJuridica()
+  obtenerJuridica(cuit: integer)
+}
+
+class ResponsablePagoDAO{
+  crearRespPago()
+  modificarRespPago()
+  eliminarRespPago()
+  obtenerRespPago(cuit: integer)
+}
+
+class FacturaDAO{
+  crearFactura()
+  modificarFactura()
+  eliminarFactura()
+  obtenerFactura(cuit: integer; tipoDoc: string; nroDoc: integer)
+}
+
+class EstadiaDAO{
+  crearEstadia()
+  modificarEstadia()
+  eliminarEstadia()
+  obtenerEstadia()
+}
+
+class NotaCreditoDAO{
+  crearNotaCredito()
+  modificarNotaCredito()
+  eliminarNotaCredito()
+  obtenerNotaCredito(nroFactura: integer)
+}
+
+class DireccionDAO{
+  crearDireccion()
+  modificarDireccion()
+  eliminarDireccion()
+  obtenerDireccion(cuit: integer; tipoDoc: string; nroDoc: integer)
+}
+
+class PagoDAO{
+  crearPago()
+  modificaPago()
+  eliminarPago()
+  obtenerPago(nroFactura: integer)
+}
+
+class TipoHabitacionDAO{
+  crearTipoHabitacion(): TipoHabitacion
+  modificarTipoHabitacion(): void
+  eliminarTipoHabitacion(): void
+  obtenerTipoHabitacion(habitacion: Habitacion)
+}
+
+class MedioDePagoDAO{
+  crearmedioDePago(): MedioDePago
+  eliminarMediodePago(): void
+  modificarMediodePago(): void
+}
+
+class CreditoDAO{
+}
+
+class MonedaExtranjeraDAO{
+}
+
+class DebitoDAO{
+}
+
+class ChequeDAO{
+}
+
+class DetalleReserva {
+    +idDetalle : int
+    +precio : double
+    +cantidad : int
+    +habitacion : Habitacion
+    +reserva : Reserva
+}
+Reserva "1" -- "1..*" DetalleReserva
+DetalleReserva "1..*" -- "1" Habitacion
+class DetalleNotaCredito {
+    +idNota : int
+    +factura : Factura
+    +notaCredito: NotaCredito
+    +monto_aplicado : double
+}
+
+class DireccionId {
+    +calle: string
+    +numero: int
+    +departamento: string
+    +piso: int
+    +codPostal: int
+}
+
+class UsuarioId {
+    +nombre: string
+    +psw: string
+}
+
+class Usuario {
+    +credenciales: UsuarioId
+}
+
+class GestorUsuario {
+    crearUsuario(): UsuarioDTO
+    cambiarPsw(): void 
+    validarUsuario(): Usuario 
+    findAll(): List<Usuario>
+}
+
+class UsuarioDAO {
+    crearUsuario()
+    modificarUsuario()
+    eliminarUsuario()
+    obtenerUsuario(string nombre)
+}
+
+class UsuarioDTO {
+  nombre: string
+  psw: string
+}
+class ReservaFacade {
+  procesarCrearReserva(ReservaDTO r, HuespedDTO h, HabitacionDTO hab): void
+}
+class DetalleReservaDTO {
+  idDetalle: int
+  idHabitacion: int
+  precio: double
+  idReserva: int
+}
+class GestorDetalleReserva {
+  crearDetalle_Reserva(Integer detalle, Reserva r, HabitacionDTO h): void
+  eliminarDetalle(Integer idDetalle): void
+  darDeBajaHabitacion(Integer idDetalle, Habitacion h): void
+  obtenerDetalleByIdReservaAndIdHabitacion(Integer idReserva, Integer idHabitacion): DetalleReserva
+  obtenerDetalle(Integer idDetalle): DetalleReserva
+  obtenerTodos(): List<DetalleReserva>
+  guardarDetalle(DetalleReserva dr): void
+  buscarReservasEnConflicto(LocalDate fechaInicio, LocalDate fechaFin): List<DetalleReserva>
+}
+class DetalleReservaDAO {
+  findById(Integer idDetalle):Optional<DetalleReserva>
+  existsByHabitacion_IdHabitacionAndReserva_IdReserva(Integer idHabitacion, Integer idReserva): boolean
+  findByReserva_IdReserva(Integer idReserva): List<DetalleReserva>
+  getById(Integer idDetalle): DetalleReserva
+  deleteById(Integer idDetalle): void
+  findByReserva_IdReservaAndHabitacion_IdHabitacion(Integer idReserva, Integer IdHabitacion): DetalleReserva
+  findReservasEnRango: List<DetalleReserva>
+}
+class DetalleEstadia{
+  idDetalleEstadia: int
+  estadia: Estadia
+  huesped: Huesped
+}
+class DetalleEstadiaDTO{
+  idDetalleEstadia: int
+  estadia: Estadia
+  huesped: Huesped
+}
+class DetalleEstadiaDAO{
+  
+}
+DireccionId "1" --> "1" Direccion
+UsuarioId "1" --> "1" Usuario
+GestorUsuario ..> Usuario
+GestorUsuario ..> UsuarioDAO
+UsuarioDAO ..> UsuarioDTO
+NotaCredito "1" -- "1..*" DetalleNotaCredito
+DetalleNotaCredito "0..*" -- "1" Factura
+DetalleEstadia "1..*" -- "1" Estadia
+Estadia  "0..1" -  "0..1" Reserva : de
+Estadia "1" --> "1..*" Factura : facturada
+Estadia "0..*" - "1" Habitacion
+Huesped "1" --> "1" Direccion : vive en
+Estadia "0.." - "1.." Huesped
+Juridica "1" --> "1" Direccion : se ubica en
+Juridica ..> ResponsablePago
+Habitacion "1" *-down- "1" TipoHabitacion : Composition
+MedioDePago <|-down- Efectivo: Inheritance
+MedioDePago <|-down- MonedaExtranjera: Inheritance
+MedioDePago <|-down- Cheque: Inheritance
+MedioDePago <|-down- Debito: Inheritance
+MedioDePago <|-down- Credito: Inheritance
+Pago "1" *-down- "1..*" MedioDePago
+Factura "1" o-- "0..*" Pago : posee
+Factura  "0..*" o-- "1" ResponsablePago: pagaga por
+Estadia "0.." o-- "0.." Consumible 
+GestorEstadia ..> Estadia
+GestorHabitacion ..> Habitacion
+GestorReserva ..> Reserva
+GestorResponsablePago ..> ResponsablePago
+GestorResponsablePago ..> Direccion
+GestorJuridica ..> Juridica
+GestorHuesped ..> Huesped
+GestorPago ..> Pago
+GestorFactura ..> Factura
+GestorMedioPago ..> MedioDePago
+GestorTipoHabitacion ..> TipoHabitacion
+GestorTelefono ..> Telefono
+GestorReserva ..> DetalleReserva
+ReservaFacade ..> GestorReserva
+ReservaFacade ..> GestorHuesped
+ReservaFacade ..> GestorHabitacion
+ReservaFacade ..> DetalleReserva
+Telefono "1..*" --> "1" Huesped
+
+GestorEstadia ..> EstadiaDAO
+GestorHabitacion ..> HabitacionDAO
+GestorHabitacion ..> TipoHabitacionDAO
+GestorReserva ..> ReservaDAO
+GestorResponsablePago ..> ResponsablePagoDAO
+GestorFactura ..> NotaCreditoDAO
+GestorJuridica ..> JuridicaDAO
+GestorHuesped ..> HuespedDAO
+GestorHuesped ..> DireccionDAO
+GestorFactura ..> FacturaDAO
+GestorResponsablePago ..> DireccionDAO
+GestorPago ..> PagoDAO
+GestorMedioPago ..> MedioDePagoDAO
+GestorTipoHabitacion ..> TipoHabitacionDAO
+GestorTelefono ..> TelefonoDTO
+GestorDetalleReserva ..> DetalleReserva
+GestorDetalleReserva ..> DetalleReservaDAO
+
+
+HabitacionDAO ..> HabitacionDTO
+TipoHabitacionDAO ..> TipoHabitacionDTO
+ReservaDAO ..> ReservaDTO
+HuespedDAO ..> HuespedDTO
+JuridicaDAO ..> JuridicaDTO
+ResponsablePagoDAO ..> ResponsablePagoDTO
+FacturaDAO ..> FacturaDTO
+EstadiaDAO ..> EstadiaDTO
+NotaCreditoDAO ..> NotaCreditoDTO
+DireccionDAO ..> DireccionDTO
+DetalleReservaDAO ..> DetalleReservaDTO
+DetalleEstadiaDAO ..> DetalleEstadiaDTO
+TipoHabitacionDAO ..> TipoHabitacionDTO
+PagoDAO ..> PagoDTO
+ReservaDAO ..> CeldaCalendarioDTO
+EstadiaDAO ..> CeldaCalendarioDTO
+MedioDePagoDAO ..> MedioDePagoDTO
+MedioDePagoDAO <|.down. DebitoDAO : Inheritance
+MedioDePagoDAO <|.down. MonedaExtranjeraDAO : Inheritance
+MedioDePagoDAO <|.down. ChequeDAO : Inheritance
+MedioDePagoDAO <|.down. CreditoDAO : Inheritance
+
+ReservaDTO "0..*" --> "1" HuespedDTO 
+ReservaDTO "0..*" - "1" HabitacionDTO  
+EstadiaDTO  "0..1" -  "0..1" ReservaDTO
+EstadiaDTO "1" --> "1..*" FacturaDTO
+EstadiaDTO "0..*" - "1" HabitacionDTO
+HuespedDTO "1" --> "1" DireccionDTO
+EstadiaDTO "0.." - "1.." HuespedDTO
+JuridicaDTO "1" --> "1" DireccionDTO
+JuridicaDTO ..> ResponsablePagoDTO
+TelefonoDTO ..> HuespedDTO
+FacturaDTO  "0..*" o-- "1" ResponsablePagoDTO
+NotaCreditoDTO "0..1" - "1..*" FacturaDTO
+FacturaDTO "1" o-- "0..*" PagoDTO
+HabitacionDTO "1" --> "1" TipoHabitacionDTO
+DetalleEstadiaDTO "1" --> "1" Estadia
+PagoDTO "1" --> "1" MedioDePagoDTO
+OcupacionRequestDTO "1" --> "1..*" HuespedDTO
+OcupacionRequestDTO "1" --> "1..*" HabitacionDTO
+CeldaCalendarioDTO "1" --> "1" ReservaDTO
+CeldaCalendarioDTO "1" --> "1" HabitacionDTO
+MedioDePagoDTO <|.down. DebitoDTO : Inheritance
+MedioDePagoDTO <|.down. MonedaExtranjeraDTO : Inheritance
+MedioDePagoDTO <|.down. ChequeDTO : Inheritance
+MedioDePagoDTO <|.down. CreditoDTO : Inheritance
+
+
+@enduml
